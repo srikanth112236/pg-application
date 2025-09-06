@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Auth Debug</title>
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 3px;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-danger { background-color: #dc3545; color: white; }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            width: 200px;
+        }
+        .debug-info {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Frontend Authentication Debug</h1>
+    
+    <div class="test-section">
+        <h2>Environment Check</h2>
+        <button onclick="checkEnvironment()">Check Environment</button>
+        <div id="environmentResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>API Connection Test</h2>
+        <button onclick="testAPIConnection()">Test API Connection</button>
+        <div id="apiConnectionResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Login Test (Frontend Style)</h2>
+        <input type="email" id="email" placeholder="Email" value="admin@pg.com">
+        <input type="password" id="password" placeholder="Password" value="Admin123!">
+        <button class="btn-primary" onclick="testFrontendLogin()">Test Frontend Login</button>
+        <div id="frontendLoginResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Redux Simulation</h2>
+        <button onclick="simulateReduxLogin()">Simulate Redux Login</button>
+        <div id="reduxResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Debug Information</h2>
+        <button onclick="showDebugInfo()">Show Debug Info</button>
+        <div id="debugInfo"></div>
+    </div>
+
+    <script>
+        // Use relative URL when served from web server, or direct URL when opened as file
+        const API_BASE_URL = window.location.protocol === 'file:' 
+            ? 'http://localhost:5000/api' 
+            : '/api';
+
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+
+        function checkEnvironment() {
+            const envInfo = {
+                'API_BASE_URL': API_BASE_URL,
+                'User Agent': navigator.userAgent,
+                'Platform': navigator.platform,
+                'Cookies Enabled': navigator.cookieEnabled,
+                'Local Storage': typeof(Storage) !== "undefined" ? 'Available' : 'Not Available',
+                'Current URL': window.location.href,
+                'Protocol': window.location.protocol,
+                'Host': window.location.host
+            };
+
+            let envText = '<strong>Environment Information:</strong><br>';
+            for (const [key, value] of Object.entries(envInfo)) {
+                envText += `${key}: ${value}<br>`;
+            }
+
+            showResult('environmentResult', envText, 'info');
+        }
+
+        async function testAPIConnection() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@pg.com',
+                        password: 'Admin123!'
+                    })
+                });
+
+                const data = await response.json();
+                
+                showResult('apiConnectionResult', `
+                    <strong>API Connection Test:</strong><br>
+                    Status: ${response.status}<br>
+                    Status Text: ${response.statusText}<br>
+                    Success: ${data.success}<br>
+                    Message: ${data.message}<br>
+                    Has User: ${!!data.data?.user}<br>
+                    Has Tokens: ${!!data.data?.tokens}<br>
+                    Response Headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2)}
+                `, response.ok ? 'success' : 'error');
+            } catch (error) {
+                showResult('apiConnectionResult', `
+                    <strong>API Connection Failed!</strong><br>
+                    Error: ${error.message}<br>
+                    Type: ${error.name}<br>
+                    <br>
+                    <strong>Possible Issues:</strong><br>
+                    1. Backend server not running<br>
+                    2. CORS issues<br>
+                    3. Network connectivity<br>
+                    4. Wrong API URL
+                `, 'error');
+            }
+        }
+
+        async function testFrontendLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                console.log('🔍 Starting frontend login test...');
+                console.log('📧 Email:', email);
+                console.log('🔑 Password:', password);
+
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                console.log('📡 Response status:', response.status);
+                console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
+
+                const data = await response.json();
+                console.log('📊 Response data:', data);
+
+                if (response.ok && data.success && data.data?.tokens) {
+                    // Simulate frontend localStorage storage
+                    localStorage.setItem('accessToken', data.data.tokens.accessToken);
+                    localStorage.setItem('refreshToken', data.data.tokens.refreshToken);
+                    localStorage.setItem('user', JSON.stringify(data.data.user));
+
+                    console.log('✅ Tokens stored in localStorage');
+                    console.log('🔑 Access token length:', data.data.tokens.accessToken.length);
+                    console.log('🔄 Refresh token length:', data.data.tokens.refreshToken.length);
+
+                    showResult('frontendLoginResult', `
+                        <strong>Frontend Login Success!</strong><br>
+                        Status: ${response.status}<br>
+                        Success: ${data.success}<br>
+                        Message: ${data.message}<br>
+                        User: ${JSON.stringify(data.data.user, null, 2)}<br>
+                        Access Token Length: ${data.data.tokens.accessToken.length}<br>
+                        Refresh Token Length: ${data.data.tokens.refreshToken.length}<br>
+                        <br>
+                        <strong>✅ Tokens stored in localStorage</strong>
+                    `, 'success');
+                } else {
+                    showResult('frontendLoginResult', `
+                        <strong>Frontend Login Failed!</strong><br>
+                        Status: ${response.status}<br>
+                        Success: ${data.success}<br>
+                        Message: ${data.message}<br>
+                        Error: ${data.error || 'No error details'}
+                    `, 'error');
+                }
+            } catch (error) {
+                console.error('❌ Frontend login error:', error);
+                showResult('frontendLoginResult', `
+                    <strong>Frontend Login Error!</strong><br>
+                    Error: ${error.message}<br>
+                    Type: ${error.name}
+                `, 'error');
+            }
+        }
+
+        function simulateReduxLogin() {
+            try {
+                // Simulate Redux state
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                const accessToken = localStorage.getItem('accessToken');
+                const refreshToken = localStorage.getItem('refreshToken');
+
+                const reduxState = {
+                    user: user,
+                    isAuthenticated: !!accessToken,
+                    isLoading: false,
+                    error: null,
+                    loginSuccess: 'Login successful'
+                };
+
+                showResult('reduxResult', `
+                    <strong>Redux State Simulation:</strong><br>
+                    User: ${JSON.stringify(user, null, 2)}<br>
+                    Is Authenticated: ${reduxState.isAuthenticated}<br>
+                    Is Loading: ${reduxState.isLoading}<br>
+                    Error: ${reduxState.error || 'None'}<br>
+                    Login Success: ${reduxState.loginSuccess}<br>
+                    <br>
+                    <strong>localStorage Contents:</strong><br>
+                    Access Token: ${accessToken ? 'Present' : 'Not found'}<br>
+                    Refresh Token: ${refreshToken ? 'Present' : 'Not found'}<br>
+                    User: ${user ? 'Present' : 'Not found'}
+                `, 'info');
+            } catch (error) {
+                showResult('reduxResult', `
+                    <strong>Redux Simulation Error!</strong><br>
+                    Error: ${error.message}
+                `, 'error');
+            }
+        }
+
+        function showDebugInfo() {
+            const debugInfo = {
+                'localStorage Keys': Object.keys(localStorage),
+                'localStorage accessToken': localStorage.getItem('accessToken') ? 'Present' : 'Not found',
+                'localStorage refreshToken': localStorage.getItem('refreshToken') ? 'Present' : 'Not found',
+                'localStorage user': localStorage.getItem('user') ? 'Present' : 'Not found',
+                'User Agent': navigator.userAgent,
+                'Current URL': window.location.href,
+                'API Base URL': API_BASE_URL,
+                'Console Logs': 'Check browser console for detailed logs'
+            };
+
+            let debugText = '<div class="debug-info">';
+            debugText += '<strong>Debug Information:</strong><br><br>';
+            for (const [key, value] of Object.entries(debugInfo)) {
+                debugText += `<strong>${key}:</strong> ${value}<br>`;
+            }
+            debugText += '</div>';
+
+            showResult('debugInfo', debugText, 'info');
+        }
+
+        // Auto-run environment check on page load
+        window.onload = function() {
+            checkEnvironment();
+            showDebugInfo();
+        };
+    </script>
+</body>
+</html> 

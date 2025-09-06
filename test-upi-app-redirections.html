@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPI App Redirection Test</title>
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #555;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 20px;
+            margin: 5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+        }
+        .gpay { background: linear-gradient(135deg, #4285f4 0%, #34a853 100%); }
+        .paytm { background: linear-gradient(135deg, #00baf2 0%, #0082c8 100%); }
+        .phonepe { background: linear-gradient(135deg, #5f259f 0%, #3c1361 100%); }
+        .universal { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); }
+        
+        .info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .warning {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .code {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: "Inter", sans-serif;
+            font-size: 12px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 UPI App Redirection Test</h1>
+        
+        <div class="info">
+            <strong>Test Instructions:</strong><br>
+            Click on the buttons below to test UPI app redirections. Make sure you have the respective apps installed on your device.
+        </div>
+        
+        <!-- Test Data -->
+        <div class="test-section">
+            <h3>📋 Test Payment Details</h3>
+            <div class="code">
+                UPI ID: testuser@paytm<br>
+                UPI Name: Test PG Admin<br>
+                Phone Number: +91-9876543210
+            </div>
+        </div>
+        
+        <!-- Google Pay Tests -->
+        <div class="test-section">
+            <h3>🟢 Google Pay Tests</h3>
+            <button class="button gpay" onclick="openGPay()">📱 Open Google Pay (UPI)</button>
+            <button class="button gpay" onclick="openGPayWithNumber()">📞 Open Google Pay (Number)</button>
+            
+            <div class="warning">
+                <strong>Expected:</strong> Google Pay app opens with payment details pre-filled
+            </div>
+        </div>
+        
+        <!-- Paytm Tests -->
+        <div class="test-section">
+            <h3>🔵 Paytm Tests</h3>
+            <button class="button paytm" onclick="openPaytm()">📱 Open Paytm (UPI)</button>
+            <button class="button paytm" onclick="openPaytmWithNumber()">📞 Open Paytm (Number)</button>
+            
+            <div class="warning">
+                <strong>Expected:</strong> Paytm app opens with payment details pre-filled
+            </div>
+        </div>
+        
+        <!-- PhonePe Tests -->
+        <div class="test-section">
+            <h3>🟣 PhonePe Tests</h3>
+            <button class="button phonepe" onclick="openPhonePe()">📱 Open PhonePe (UPI)</button>
+            <button class="button phonepe" onclick="openPhonePeWithNumber()">📞 Open PhonePe (Number)</button>
+            
+            <div class="warning">
+                <strong>Expected:</strong> PhonePe app opens with payment details pre-filled
+            </div>
+        </div>
+        
+        <!-- Universal UPI Tests -->
+        <div class="test-section">
+            <h3>🚀 Universal UPI Test</h3>
+            <button class="button universal" onclick="openUPIApp()">🌐 Open Any UPI App</button>
+            
+            <div class="warning">
+                <strong>Expected:</strong> System shows app chooser with all UPI apps installed
+            </div>
+        </div>
+        
+        <!-- URL Schemes Reference -->
+        <div class="test-section">
+            <h3>🔧 URL Schemes Reference</h3>
+            <div class="code">
+                Google Pay: tez://upi/pay?pa=UPI_ID&pn=NAME&tn=NOTE<br>
+                Paytm: paytmmp://upi/pay?pa=UPI_ID&pn=NAME&tn=NOTE<br>
+                PhonePe: phonepe://upi/pay?pa=UPI_ID&pn=NAME&tn=NOTE<br>
+                Universal: upi://pay?pa=UPI_ID&pn=NAME&tn=NOTE&am=AMOUNT&cu=INR
+            </div>
+        </div>
+        
+        <div class="info">
+            <strong>Fallback Behavior:</strong><br>
+            If an app is not installed, users will be prompted to install it from Play Store.
+        </div>
+    </div>
+
+    <script>
+        const testUpiId = 'testuser@paytm';
+        const testUpiName = 'Test PG Admin';
+        const testPhoneNumber = '+91-9876543210';
+        
+        function openGPay() {
+            const gpayUrl = `tez://upi/pay?pa=${testUpiId}&pn=${encodeURIComponent(testUpiName)}&tn=${encodeURIComponent('Payment to ' + testUpiName)}`;
+            console.log('Opening Google Pay:', gpayUrl);
+            window.location.href = gpayUrl;
+            
+            setTimeout(() => {
+                if (confirm('Google Pay app not found. Install from Play Store?')) {
+                    window.open('https://play.google.com/store/apps/details?id=com.google.android.apps.nfc.payment', '_blank');
+                }
+            }, 2000);
+        }
+        
+        function openGPayWithNumber() {
+            const cleanNumber = testPhoneNumber.replace(/^\+91-?/, '');
+            const gpayUrl = `tez://upi/pay?pa=${cleanNumber}@paytm&pn=${encodeURIComponent('PG Payment')}`;
+            console.log('Opening Google Pay with number:', gpayUrl);
+            window.location.href = gpayUrl;
+        }
+        
+        function openPaytm() {
+            const paytmUrl = `paytmmp://upi/pay?pa=${testUpiId}&pn=${encodeURIComponent(testUpiName)}&tn=${encodeURIComponent('Payment to ' + testUpiName)}`;
+            console.log('Opening Paytm:', paytmUrl);
+            window.location.href = paytmUrl;
+            
+            setTimeout(() => {
+                if (confirm('Paytm app not found. Install from Play Store?')) {
+                    window.open('https://play.google.com/store/apps/details?id=net.one97.paytm', '_blank');
+                }
+            }, 2000);
+        }
+        
+        function openPaytmWithNumber() {
+            const cleanNumber = testPhoneNumber.replace(/^\+91-?/, '');
+            const paytmUrl = `paytmmp://upi/pay?pa=${cleanNumber}@paytm&pn=${encodeURIComponent('PG Payment')}`;
+            console.log('Opening Paytm with number:', paytmUrl);
+            window.location.href = paytmUrl;
+        }
+        
+        function openPhonePe() {
+            const phonepeUrl = `phonepe://upi/pay?pa=${testUpiId}&pn=${encodeURIComponent(testUpiName)}&tn=${encodeURIComponent('Payment to ' + testUpiName)}`;
+            console.log('Opening PhonePe:', phonepeUrl);
+            window.location.href = phonepeUrl;
+            
+            setTimeout(() => {
+                if (confirm('PhonePe app not found. Install from Play Store?')) {
+                    window.open('https://play.google.com/store/apps/details?id=com.phonepe.app', '_blank');
+                }
+            }, 2000);
+        }
+        
+        function openPhonePeWithNumber() {
+            const cleanNumber = testPhoneNumber.replace(/^\+91-?/, '');
+            const phonepeUrl = `phonepe://upi/pay?pa=${cleanNumber}@ybl&pn=${encodeURIComponent('PG Payment')}`;
+            console.log('Opening PhonePe with number:', phonepeUrl);
+            window.location.href = phonepeUrl;
+        }
+        
+        function openUPIApp() {
+            const upiUrl = `upi://pay?pa=${testUpiId}&pn=${encodeURIComponent(testUpiName)}&tn=${encodeURIComponent('Payment to ' + testUpiName)}&am=&cu=INR`;
+            console.log('Opening Universal UPI:', upiUrl);
+            window.location.href = upiUrl;
+        }
+        
+        // Log when page loads
+        console.log('🚀 UPI App Redirection Test Page Loaded');
+        console.log('Test Data:', {
+            upiId: testUpiId,
+            upiName: testUpiName,
+            phoneNumber: testPhoneNumber
+        });
+    </script>
+</body>
+</html> 

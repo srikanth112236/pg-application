@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Test</title>
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 3px;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-danger { background-color: #dc3545; color: white; }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Authentication Test (localStorage)</h1>
+    
+    <div class="test-section">
+        <h2>Login Test</h2>
+        <input type="email" id="email" placeholder="Email" value="admin@pg.com">
+        <input type="password" id="password" placeholder="Password" value="Admin123!">
+        <button class="btn-primary" onclick="testLogin()">Test Login</button>
+        <div id="loginResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Current User Test</h2>
+        <button class="btn-success" onclick="testGetCurrentUser()">Get Current User</button>
+        <div id="currentUserResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Logout Test</h2>
+        <button class="btn-danger" onclick="testLogout()">Test Logout</button>
+        <div id="logoutResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Local Storage Check</h2>
+        <button onclick="checkLocalStorage()">Check Local Storage</button>
+        <div id="localStorageResult"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+
+        async function testLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('loginResult', `
+                        <strong>Login Success!</strong><br>
+                        Status: ${response.status}<br>
+                        Success: ${data.success}<br>
+                        Message: ${data.message}<br>
+                        User: ${JSON.stringify(data.data?.user, null, 2)}<br>
+                        Has Tokens: ${!!data.data?.tokens}<br>
+                        Access Token Length: ${data.data?.tokens?.accessToken?.length || 0}<br>
+                        Refresh Token Length: ${data.data?.tokens?.refreshToken?.length || 0}
+                    `, 'success');
+                } else {
+                    showResult('loginResult', `
+                        <strong>Login Failed!</strong><br>
+                        Status: ${response.status}<br>
+                        Message: ${data.message}<br>
+                        Error: ${data.error || 'No error details'}
+                    `, 'error');
+                }
+            } catch (error) {
+                showResult('loginResult', `
+                    <strong>Network Error!</strong><br>
+                    Error: ${error.message}
+                `, 'error');
+            }
+        }
+
+        async function testGetCurrentUser() {
+            try {
+                const accessToken = localStorage.getItem('accessToken');
+                const headers = {
+                    'Content-Type': 'application/json',
+                };
+                
+                if (accessToken) {
+                    headers.Authorization = `Bearer ${accessToken}`;
+                }
+
+                const response = await fetch(`${API_BASE_URL}/auth/me`, {
+                    method: 'GET',
+                    headers
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('currentUserResult', `
+                        <strong>Get Current User Success!</strong><br>
+                        Status: ${response.status}<br>
+                        Success: ${data.success}<br>
+                        User: ${JSON.stringify(data.data?.user, null, 2)}
+                    `, 'success');
+                } else {
+                    showResult('currentUserResult', `
+                        <strong>Get Current User Failed!</strong><br>
+                        Status: ${response.status}<br>
+                        Message: ${data.message}<br>
+                        Error: ${data.error || 'No error details'}
+                    `, 'error');
+                }
+            } catch (error) {
+                showResult('currentUserResult', `
+                    <strong>Network Error!</strong><br>
+                    Error: ${error.message}
+                `, 'error');
+            }
+        }
+
+        async function testLogout() {
+            try {
+                const accessToken = localStorage.getItem('accessToken');
+                const headers = {
+                    'Content-Type': 'application/json',
+                };
+                
+                if (accessToken) {
+                    headers.Authorization = `Bearer ${accessToken}`;
+                }
+
+                const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+                    method: 'POST',
+                    headers
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('logoutResult', `
+                        <strong>Logout Success!</strong><br>
+                        Status: ${response.status}<br>
+                        Success: ${data.success}<br>
+                        Message: ${data.message}
+                    `, 'success');
+                } else {
+                    showResult('logoutResult', `
+                        <strong>Logout Failed!</strong><br>
+                        Status: ${response.status}<br>
+                        Message: ${data.message}<br>
+                        Error: ${data.error || 'No error details'}
+                    `, 'error');
+                }
+            } catch (error) {
+                showResult('logoutResult', `
+                    <strong>Network Error!</strong><br>
+                    Error: ${error.message}
+                `, 'error');
+            }
+        }
+
+        function checkLocalStorage() {
+            const user = localStorage.getItem('user');
+            const accessToken = localStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken');
+
+            showResult('localStorageResult', `
+                <strong>Local Storage Contents:</strong><br>
+                User: ${user ? 'Present' : 'Not found'}<br>
+                Access Token: ${accessToken ? 'Present' : 'Not found'}<br>
+                Refresh Token: ${refreshToken ? 'Present' : 'Not found'}<br>
+                <br>
+                <strong>User Data:</strong><br>
+                <pre>${user || 'No user data'}</pre>
+                <br>
+                <strong>Token Details:</strong><br>
+                Access Token Length: ${accessToken?.length || 0}<br>
+                Refresh Token Length: ${refreshToken?.length || 0}<br>
+                Access Token Sample: ${accessToken ? accessToken.substring(0, 50) + '...' : 'N/A'}<br>
+                Refresh Token Sample: ${refreshToken ? refreshToken.substring(0, 50) + '...' : 'N/A'}
+            `, 'info');
+        }
+
+        // Auto-check on page load
+        window.onload = function() {
+            checkLocalStorage();
+        };
+    </script>
+</body>
+</html> 

@@ -1,0 +1,667 @@
+# PG Maintenance Application Development Plan
+# Last Updated: January 2025
+# Author: Full Stack Developer
+
+## 🚀 **Project Overview**
+
+**Application**: PG (Paying Guest) Maintenance Management System
+**Tech Stack**: React 18, Redux Toolkit, Node.js, Express, MongoDB, Shadcn UI, Framer Motion, Tailwind CSS
+**Architecture**: Role-based (Superadmin, Admin, User), Multi-branch support, Real-time notifications
+**Security**: JWT authentication, RBAC, input validation, audit logging
+**Deployment**: Docker, CI/CD, AWS S3 for production
+
+## 📋 **Development Phases**
+
+### **Phase 1: Superadmin Development (Weeks 1-3)**
+
+#### **Week 1: Foundation & Authentication**
+
+**Backend Setup (Days 1-3)**
+```
+/backend/
+├── src/
+│   ├── config/
+│   │   ├── database.js          # MongoDB connection
+│   │   ├── redis.js             # Redis configuration
+│   │   ├── email.js             # Nodemailer setup
+│   │   ├── storage.js           # Local file storage
+│   │   └── environment.js       # Environment validation
+│   ├── models/
+│   │   ├── user.model.js        # User with roles (superadmin, admin, user)
+│   │   ├── pg.model.js          # PG properties
+│   │   ├── auditLog.model.js    # Audit logging
+│   │   └── resetToken.model.js  # Password reset tokens
+│   ├── middleware/
+│   │   ├── auth.middleware.js   # JWT authentication
+│   │   ├── rbac.middleware.js   # Role-based access control
+│   │   ├── validation.middleware.js # Input validation
+│   │   └── rateLimit.middleware.js  # Rate limiting
+│   ├── services/
+│   │   ├── auth.service.js      # Authentication logic
+│   │   ├── email.service.js     # Email sending
+│   │   ├── storage.service.js   # File upload handling
+│   │   └── audit.service.js     # Audit logging
+│   ├── controllers/
+│   │   ├── auth.controller.js   # Auth endpoints
+│   │   └── user.controller.js   # User management
+│   ├── routes/
+│   │   ├── auth.routes.js       # Auth routes
+│   │   └── user.routes.js       # User routes
+│   └── utils/
+│       ├── logger.js            # Winston logging
+│       ├── crypto.js            # Encryption utilities
+│       └── validation.js        # Validation schemas
+```
+
+**Frontend Setup (Days 1-3)**
+```
+/frontend/
+├── src/
+│   ├── components/
+│   │   ├── common/
+│   │   │   ├── Button.jsx       # Reusable button
+│   │   │   ├── Input.jsx        # Reusable input
+│   │   │   ├── FormField.jsx    # Form field wrapper
+│   │   │   └── Loading.jsx      # Loading component
+│   │   └── auth/
+│   │       ├── LoginForm.jsx    # Login form
+│   │       └── ResetPasswordForm.jsx
+│   ├── services/
+│   │   ├── api.js              # Axios instance with interceptors
+│   │   ├── endpoints.js        # Centralized endpoints
+│   │   └── auth.service.js     # Auth API calls
+│   ├── store/
+│   │   ├── store.js            # Redux store
+│   │   └── slices/
+│   │       ├── auth.slice.js   # Auth state
+│   │       └── ui.slice.js     # UI state
+│   ├── pages/
+│   │   ├── Login.jsx           # Login page
+│   │   └── ResetPassword.jsx   # Reset password page
+│   └── layouts/
+│       └── AuthLayout.jsx      # Auth layout
+```
+
+#### **Week 2: Superadmin Core Features**
+
+**Backend Development (Days 4-7)**
+```
+/backend/src/
+├── models/
+│   ├── pg.model.js             # PG properties model
+│   ├── ticket.model.js         # Support tickets
+│   ├── payment.model.js        # Payment tracking
+│   └── analytics.model.js      # Analytics data
+├── services/
+│   ├── pg.service.js           # PG management
+│   ├── ticket.service.js       # Ticket handling
+│   ├── payment.service.js      # Payment processing
+│   ├── analytics.service.js    # Analytics calculations
+│   └── socket.service.js       # Real-time updates
+├── controllers/
+│   ├── pg.controller.js        # PG endpoints
+│   ├── ticket.controller.js    # Ticket endpoints
+│   ├── payment.controller.js   # Payment endpoints
+│   └── analytics.controller.js # Analytics endpoints
+├── routes/
+│   ├── pg.routes.js           # PG routes
+│   ├── ticket.routes.js       # Ticket routes
+│   ├── payment.routes.js      # Payment routes
+│   └── analytics.routes.js    # Analytics routes
+└── utils/
+    ├── pdfGenerator.js        # PDF generation
+    └── excelGenerator.js      # Excel export
+```
+
+**Frontend Development (Days 4-7)**
+```
+/frontend/src/
+├── components/
+│   ├── superadmin/
+│   │   ├── PgForm.jsx         # PG creation/edit form
+│   │   ├── PgTable.jsx        # PG listing table
+│   │   ├── TicketTable.jsx    # Ticket management
+│   │   ├── PaymentTable.jsx   # Payment tracking
+│   │   └── AnalyticsDashboard.jsx # Analytics charts
+│   └── common/
+│       ├── GlobalTable.jsx    # Reusable table
+│       ├── GlobalForm.jsx     # Reusable form
+│       ├── Chart.jsx          # Chart.js wrapper
+│       └── ConfirmDialog.jsx  # Confirmation dialogs
+├── pages/superadmin/
+│   ├── Dashboard.jsx          # Superadmin dashboard
+│   ├── PgManagement.jsx       # PG management
+│   ├── TicketManagement.jsx   # Ticket management
+│   ├── PaymentTracking.jsx    # Payment tracking
+│   ├── Analytics.jsx          # Analytics page
+│   └── Reports.jsx            # Reports page
+├── services/
+│   ├── pg.service.js          # PG API calls
+│   ├── ticket.service.js      # Ticket API calls
+│   ├── payment.service.js     # Payment API calls
+│   └── analytics.service.js   # Analytics API calls
+└── store/slices/
+    ├── pg.slice.js            # PG state
+    ├── ticket.slice.js        # Ticket state
+    ├── payment.slice.js       # Payment state
+    └── analytics.slice.js     # Analytics state
+```
+
+#### **Week 3: Superadmin Advanced Features**
+
+**Backend Development (Days 8-10)**
+```
+/backend/src/
+├── services/
+│   ├── report.service.js       # Report generation
+│   ├── audit.service.js        # Audit logging
+│   └── notification.service.js # Email notifications
+├── controllers/
+│   ├── report.controller.js    # Report endpoints
+│   └── audit.controller.js     # Audit endpoints
+├── routes/
+│   ├── report.routes.js       # Report routes
+│   └── audit.routes.js        # Audit routes
+└── utils/
+    ├── reminder.js            # Payment reminders
+    └── backup.js              # Data backup
+```
+
+**Frontend Development (Days 8-10)**
+```
+/frontend/src/
+├── components/superadmin/
+│   ├── ReportGenerator.jsx    # Report generation
+│   ├── AuditLogViewer.jsx     # Audit log viewer
+│   └── NotificationCenter.jsx # Notification center
+├── pages/superadmin/
+│   ├── AuditLogs.jsx         # Audit logs page
+│   └── SystemSettings.jsx    # System settings
+└── hooks/
+    ├── useSocket.js           # WebSocket hook
+    └── useAnalytics.js        # Analytics hook
+```
+
+### **Phase 2: PG Admin Development (Weeks 4-6)**
+
+#### **Week 4: Admin Foundation**
+
+**Backend Development (Days 11-13)**
+```
+/backend/src/
+├── models/
+│   ├── room.model.js          # Room management
+│   ├── resident.model.js      # Resident management
+│   ├── staff.model.js         # Staff management
+│   └── feedback.model.js      # Feedback system
+├── services/
+│   ├── room.service.js        # Room management
+│   ├── resident.service.js    # Resident management
+│   ├── staff.service.js       # Staff management
+│   └── feedback.service.js    # Feedback handling
+├── controllers/
+│   ├── room.controller.js     # Room endpoints
+│   ├── resident.controller.js # Resident endpoints
+│   ├── staff.controller.js    # Staff endpoints
+│   └── feedback.controller.js # Feedback endpoints
+└── routes/
+    ├── room.routes.js         # Room routes
+    ├── resident.routes.js     # Resident routes
+    ├── staff.routes.js        # Staff routes
+    └── feedback.routes.js     # Feedback routes
+```
+
+**Frontend Development (Days 11-13)**
+```
+/frontend/src/
+├── components/admin/
+│   ├── BranchSelector.jsx     # Branch selection
+│   ├── RoomForm.jsx           # Room creation/edit
+│   ├── ResidentForm.jsx       # Resident form
+│   ├── StaffForm.jsx          # Staff form
+│   └── FeedbackForm.jsx       # Feedback form
+├── pages/admin/
+│   ├── Onboarding.jsx         # Admin onboarding
+│   ├── Dashboard.jsx          # Admin dashboard
+│   ├── RoomManagement.jsx     # Room management
+│   ├── ResidentManagement.jsx # Resident management
+│   └── StaffManagement.jsx    # Staff management
+├── services/
+│   ├── room.service.js        # Room API calls
+│   ├── resident.service.js    # Resident API calls
+│   ├── staff.service.js       # Staff API calls
+│   └── feedback.service.js    # Feedback API calls
+└── store/slices/
+    ├── room.slice.js          # Room state
+    ├── resident.slice.js      # Resident state
+    ├── staff.slice.js         # Staff state
+    └── feedback.slice.js      # Feedback state
+```
+
+#### **Week 5: Admin Core Features**
+
+**Backend Development (Days 14-16)**
+```
+/backend/src/
+├── services/
+│   ├── payment.service.js      # Rent collection
+│   ├── salary.service.js       # Salary disbursement
+│   ├── reminder.service.js     # Payment reminders
+│   └── bulkUpload.service.js   # Bulk data import
+├── controllers/
+│   ├── payment.controller.js   # Payment endpoints
+│   └── salary.controller.js    # Salary endpoints
+├── routes/
+│   ├── payment.routes.js      # Payment routes
+│   └── salary.routes.js       # Salary routes
+└── utils/
+    ├── excelParser.js         # Excel file parsing
+    └── bulkUpload.js          # Bulk upload utilities
+```
+
+**Frontend Development (Days 14-16)**
+```
+/frontend/src/
+├── components/admin/
+│   ├── PaymentCollection.jsx  # Rent collection
+│   ├── SalaryDisbursement.jsx # Salary management
+│   ├── BulkUpload.jsx         # Bulk data upload
+│   └── ReminderSettings.jsx   # Reminder configuration
+├── pages/admin/
+│   ├── PaymentManagement.jsx  # Payment management
+│   ├── SalaryManagement.jsx   # Salary management
+│   └── BulkOperations.jsx     # Bulk operations
+└── services/
+    ├── payment.service.js     # Payment API calls
+    ├── salary.service.js      # Salary API calls
+    └── bulkUpload.service.js  # Bulk upload API calls
+```
+
+#### **Week 6: Admin Advanced Features**
+
+**Backend Development (Days 17-19)**
+```
+/backend/src/
+├── services/
+│   ├── analytics.service.js    # Admin analytics
+│   ├── report.service.js       # Admin reports
+│   └── notification.service.js # Admin notifications
+├── controllers/
+│   ├── analytics.controller.js # Analytics endpoints
+│   └── report.controller.js    # Report endpoints
+└── routes/
+    ├── analytics.routes.js    # Analytics routes
+    └── report.routes.js       # Report routes
+```
+
+**Frontend Development (Days 17-19)**
+```
+/frontend/src/
+├── components/admin/
+│   ├── AnalyticsDashboard.jsx # Admin analytics
+│   ├── ReportGenerator.jsx    # Report generation
+│   └── SettingsPanel.jsx      # Admin settings
+├── pages/admin/
+│   ├── Analytics.jsx          # Analytics page
+│   ├── Reports.jsx            # Reports page
+│   └── Settings.jsx           # Settings page
+└── hooks/
+    ├── useAdminAnalytics.js   # Admin analytics hook
+    └── useAdminReports.js     # Admin reports hook
+```
+
+### **Phase 3: User (Tenant) Development (Weeks 7-8)**
+
+#### **Week 7: User Core Features**
+
+**Backend Development (Days 20-22)**
+```
+/backend/src/
+├── services/
+│   ├── tenantPayment.service.js # Tenant payment
+│   ├── tenantTicket.service.js  # Tenant tickets
+│   └── tenantFeedback.service.js # Tenant feedback
+├── controllers/
+│   ├── tenantPayment.controller.js # Tenant payment endpoints
+│   ├── tenantTicket.controller.js  # Tenant ticket endpoints
+│   └── tenantFeedback.controller.js # Tenant feedback endpoints
+└── routes/
+    ├── tenantPayment.routes.js # Tenant payment routes
+    ├── tenantTicket.routes.js  # Tenant ticket routes
+    └── tenantFeedback.routes.js # Tenant feedback routes
+```
+
+**Frontend Development (Days 20-22)**
+```
+/frontend/src/
+├── components/user/
+│   ├── PaymentCard.jsx        # Payment interface
+│   ├── TicketForm.jsx         # Ticket submission
+│   ├── FeedbackForm.jsx       # Feedback submission
+│   └── StatusCard.jsx         # Status display
+├── pages/user/
+│   ├── TenantDashboard.jsx    # Tenant dashboard
+│   ├── PaymentHistory.jsx     # Payment history
+│   ├── TicketHistory.jsx      # Ticket history
+│   └── Profile.jsx            # User profile
+├── services/
+│   ├── tenantPayment.service.js # Tenant payment API
+│   ├── tenantTicket.service.js  # Tenant ticket API
+│   └── tenantFeedback.service.js # Tenant feedback API
+└── store/slices/
+    ├── tenantPayment.slice.js # Tenant payment state
+    ├── tenantTicket.slice.js  # Tenant ticket state
+    └── tenantFeedback.slice.js # Tenant feedback state
+```
+
+#### **Week 8: User Advanced Features**
+
+**Backend Development (Days 23-25)**
+```
+/backend/src/
+├── services/
+│   ├── onboarding.service.js   # Onboarding process
+│   ├── offboarding.service.js  # Offboarding process
+│   └── notification.service.js # User notifications
+├── controllers/
+│   ├── onboarding.controller.js # Onboarding endpoints
+│   └── offboarding.controller.js # Offboarding endpoints
+└── routes/
+    ├── onboarding.routes.js   # Onboarding routes
+    └── offboarding.routes.js  # Offboarding routes
+```
+
+**Frontend Development (Days 23-25)**
+```
+/frontend/src/
+├── components/user/
+│   ├── OnboardingWizard.jsx   # Onboarding wizard
+│   ├── OffboardingForm.jsx    # Offboarding form
+│   └── NotificationCenter.jsx  # User notifications
+├── pages/user/
+│   ├── Onboarding.jsx         # Onboarding page
+│   ├── Offboarding.jsx        # Offboarding page
+│   └── Notifications.jsx      # Notifications page
+└── hooks/
+    ├── useOnboarding.js       # Onboarding hook
+    └── useNotifications.js    # Notifications hook
+```
+
+### **Phase 4: Testing & Optimization (Weeks 9-10)**
+
+#### **Week 9: Testing**
+
+**Backend Testing (Days 26-28)**
+```
+/backend/tests/
+├── unit/
+│   ├── auth.test.js           # Auth unit tests
+│   ├── pg.test.js             # PG unit tests
+│   ├── payment.test.js        # Payment unit tests
+│   └── analytics.test.js      # Analytics unit tests
+├── integration/
+│   ├── auth.integration.test.js # Auth integration tests
+│   ├── pg.integration.test.js   # PG integration tests
+│   └── payment.integration.test.js # Payment integration tests
+└── e2e/
+    ├── superadmin.test.js     # Superadmin E2E tests
+    ├── admin.test.js          # Admin E2E tests
+    └── user.test.js           # User E2E tests
+```
+
+**Frontend Testing (Days 26-28)**
+```
+/frontend/tests/
+├── unit/
+│   ├── components/
+│   │   ├── Button.test.js     # Button component tests
+│   │   ├── Form.test.js       # Form component tests
+│   │   └── Table.test.js      # Table component tests
+│   ├── services/
+│   │   ├── api.test.js        # API service tests
+│   │   └── auth.test.js       # Auth service tests
+│   └── hooks/
+│       ├── useAuth.test.js    # Auth hook tests
+│       └── useSocket.test.js  # Socket hook tests
+├── integration/
+│   ├── auth.integration.test.js # Auth flow tests
+│   ├── pg.integration.test.js   # PG flow tests
+│   └── payment.integration.test.js # Payment flow tests
+└── e2e/
+    ├── superadmin.spec.js     # Superadmin E2E tests
+    ├── admin.spec.js          # Admin E2E tests
+    └── user.spec.js           # User E2E tests
+```
+
+#### **Week 10: Optimization**
+
+**Backend Optimization (Days 29-31)**
+```
+/backend/src/
+├── config/
+│   ├── cache.js               # Redis caching
+│   └── compression.js         # Response compression
+├── middleware/
+│   ├── cache.middleware.js    # Caching middleware
+│   └── compression.middleware.js # Compression middleware
+└── utils/
+    ├── performance.js         # Performance monitoring
+    └── optimization.js        # Query optimization
+```
+
+**Frontend Optimization (Days 29-31)**
+```
+/frontend/src/
+├── components/
+│   └── common/
+│       ├── LazyLoader.jsx     # Lazy loading
+│       └── VirtualList.jsx    # Virtual scrolling
+├── hooks/
+│   ├── useLazyLoad.js         # Lazy loading hook
+│   └── useVirtualScroll.js    # Virtual scroll hook
+└── utils/
+    ├── performance.js         # Performance monitoring
+    └── optimization.js        # Component optimization
+```
+
+### **Phase 5: Deployment Preparation (Weeks 11-12)**
+
+#### **Week 11: Production Setup**
+
+**Backend Production (Days 32-34)**
+```
+/backend/
+├── Dockerfile                 # Backend container
+├── docker-compose.yml         # Development setup
+├── scripts/
+│   ├── deploy.sh             # Deployment script
+│   ├── backup.sh             # Backup script
+│   └── maintenance.sh        # Maintenance script
+└── config/
+    ├── production.js          # Production config
+    └── s3.js                 # AWS S3 config
+```
+
+**Frontend Production (Days 32-34)**
+```
+/frontend/
+├── Dockerfile                 # Frontend container
+├── nginx.conf                 # Nginx configuration
+├── scripts/
+│   ├── build.sh              # Build script
+│   └── deploy.sh             # Deployment script
+└── config/
+    ├── production.js          # Production config
+    └── cdn.js                # CDN configuration
+```
+
+#### **Week 12: CI/CD & Monitoring**
+
+**CI/CD Setup (Days 35-37)**
+```
+/.github/
+├── workflows/
+│   ├── backend.yml           # Backend CI/CD
+│   ├── frontend.yml          # Frontend CI/CD
+│   └── e2e.yml              # E2E testing
+├── scripts/
+│   ├── test.sh              # Test runner
+│   ├── lint.sh              # Linting
+│   └── security.sh          # Security scan
+└── docs/
+    ├── API.md               # API documentation
+    ├── DEPLOYMENT.md        # Deployment guide
+    └── CONTRIBUTING.md      # Contributing guide
+```
+
+## 📋 **Development Checklist**
+
+### **Phase 1: Superadmin (Weeks 1-3)**
+- [ ] Backend authentication system
+- [ ] Frontend login/reset password
+- [ ] PG management (CRUD)
+- [ ] Ticket management system
+- [ ] Payment tracking
+- [ ] Analytics dashboard
+- [ ] Report generation
+- [ ] Audit logging
+
+### **Phase 2: PG Admin (Weeks 4-6)**
+- [ ] Admin onboarding
+- [ ] Branch management
+- [ ] Room management
+- [ ] Resident management
+- [ ] Staff management
+- [ ] Payment collection
+- [ ] Salary disbursement
+- [ ] Admin analytics
+
+### **Phase 3: User/Tenant (Weeks 7-8)**
+- [ ] Tenant dashboard
+- [ ] Payment interface
+- [ ] Ticket submission
+- [ ] Feedback system
+- [ ] Onboarding/offboarding
+- [ ] Notification system
+
+### **Phase 4: Testing (Weeks 9-10)**
+- [ ] Unit tests (backend & frontend)
+- [ ] Integration tests
+- [ ] E2E tests
+- [ ] Performance optimization
+- [ ] Security audit
+
+### **Phase 5: Deployment (Weeks 11-12)**
+- [ ] Docker containerization
+- [ ] CI/CD pipeline
+- [ ] Production configuration
+- [ ] Monitoring setup
+- [ ] Documentation
+
+## 🎯 **Key Development Principles**
+
+1. **Simultaneous Development**: Backend and frontend developed together
+2. **Global Components**: Reusable components for consistency
+3. **Security First**: JWT, RBAC, input validation throughout
+4. **Performance**: Caching, optimization, lazy loading
+5. **Testing**: Comprehensive test coverage
+6. **Documentation**: Clear documentation for all features
+7. **Scalability**: Designed for multi-branch support
+8. **User Experience**: Intuitive, responsive design
+
+## 🛠️ **Tech Stack Details**
+
+### **Frontend**
+- React 18 with hooks
+- Redux Toolkit for state management
+- Shadcn UI for components
+- Framer Motion for animations
+- Tailwind CSS for styling
+- Axios for API calls
+- Chart.js for analytics
+- Socket.IO for real-time updates
+
+### **Backend**
+- Node.js with Express
+- MongoDB with Mongoose
+- Redis for caching
+- JWT for authentication
+- Socket.IO for real-time
+- Nodemailer for emails
+- Multer for file uploads
+- Winston for logging
+
+### **Security**
+- JWT tokens (access & refresh)
+- Role-based access control (RBAC)
+- Input validation with Joi
+- XSS protection with DOMPurify
+- CSRF protection
+- Rate limiting
+- Audit logging
+
+### **Deployment**
+- Docker containerization
+- AWS S3 for file storage
+- AWS SES for emails
+- CI/CD with GitHub Actions
+- Nginx for frontend
+- PM2 for backend
+
+## 📁 **Complete Folder Structure**
+
+```
+/pg-maintenance-app/
+├── /frontend/
+│   ├── /public/
+│   │   ├── /locales/
+│   │   │   ├── en.json
+│   │   │   └── hi.json
+│   │   └── index.html
+│   ├── /src/
+│   │   ├── /components/
+│   │   │   ├── /common/
+│   │   │   ├── /superadmin/
+│   │   │   ├── /admin/
+│   │   │   └── /user/
+│   │   ├── /pages/
+│   │   ├── /services/
+│   │   ├── /store/
+│   │   ├── /hooks/
+│   │   ├── /layouts/
+│   │   ├── /utils/
+│   │   └── /types/
+│   ├── package.json
+│   └── tailwind.config.js
+├── /backend/
+│   ├── /src/
+│   │   ├── /config/
+│   │   ├── /controllers/
+│   │   ├── /middleware/
+│   │   ├── /models/
+│   │   ├── /routes/
+│   │   ├── /services/
+│   │   ├── /utils/
+│   │   └── /types/
+│   ├── /uploads/
+│   ├── /tests/
+│   ├── package.json
+│   └── server.js
+├── /docs/
+├── docker-compose.yml
+├── .gitignore
+└── README.md
+```
+
+## 🚀 **Implementation Priority**
+
+1. **Start with Phase 1**: Superadmin features (authentication, PG management)
+2. **Build global components**: Forms, tables, charts for reusability
+3. **Implement security**: JWT, RBAC, validation throughout
+4. **Add real-time features**: Socket.IO for notifications
+5. **Create admin features**: Room, resident, staff management
+6. **Develop user features**: Payment, feedback, tickets
+7. **Test thoroughly**: Unit, integration, E2E tests
+8. **Deploy securely**: Docker, CI/CD, monitoring
+
+This plan ensures a structured, efficient development process with clear milestones and deliverables for each phase. 

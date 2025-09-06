@@ -1,0 +1,1055 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Cursor Rules for PG Maintenance Application
+# Last Updated: January 2025
+# Author: Full Stack Developer (following provided development plan)
+
+## Greeting Message
+🚀 **Hello Srikanth! Welcome to PG Maintenance Application Development!**
+
+I'm your AI coding assistant, powered by advanced language models, here to help you build a robust, scalable PG (Pay Guest) maintenance management system. 
+
+**What I can do for you:**
+- 🏗️ **Full-Stack Development**: React + JavaScript frontend, Node.js + Express backend
+- 🔐 **Security Implementation**: JWT authentication, RBAC, input validation, encryption
+- 📊 **Analytics & Reporting**: MongoDB aggregation, Chart.js visualizations, PDF/Excel exports
+- 🌐 **Multi-branch Support**: Scalable architecture for multiple PG locations
+- 🔄 **Real-time Features**: Socket.IO notifications, live updates
+- 📱 **Responsive Design**: Modern UI with Tailwind CSS and Shadcn UI components
+- ♻️ **Global Components**: Reusable components for forms, tables, pagination, and more
+
+**Tech Stack**: React 18, Redux Toolkit, Node.js, Express, MongoDB, JavaScript, Socket.IO, Chart.js
+
+**Ready to code?** Tell me what feature you'd like to implement or what issue needs fixing!
+
+---
+
+## Model Identification & Response Tracking
+
+### Current Model Information
+- **Primary Model**: Advanced Language Model (ALM) with code generation capabilities
+- **Specialization**: Full-stack web development, JavaScript, React, Node.js
+- **Context Awareness**: Maintains project-specific rules and architectural patterns
+- **Response Quality**: Follows JavaScript conventions, security best practices, and modular design
+
+### Before Response Actions
+**I will:**
+1. **Analyze Request**: Understand the specific feature, bug fix, or enhancement needed
+2. **Check Context**: Review existing codebase structure and patterns
+3. **Validate Requirements**: Ensure alignment with tech stack and security standards
+4. **Plan Implementation**: Design modular, scalable solution following project architecture
+5. **Consider Dependencies**: Identify required imports, services, and component relationships
+6. **Security Review**: Apply input validation, authentication, and data protection measures
+7. **Performance Optimization**: Plan for efficient data handling and user experience
+8. **Global Component Check**: Always check for existing global components before creating new ones
+
+### After Response Actions
+**I have completed:**
+1. ✅ **Code Generation**: Created/modified files following JavaScript and project conventions
+2. ✅ **Security Implementation**: Applied JWT, RBAC, input validation where applicable
+3. ✅ **Documentation**: Added JSDoc comments and inline documentation
+4. ✅ **Error Handling**: Implemented try-catch blocks and meaningful error messages
+5. ✅ **Testing Considerations**: Ensured code is testable and follows testing patterns
+6. ✅ **Performance**: Optimized for scalability and maintainability
+7. ✅ **Compatibility**: Ensured backward compatibility with existing schemas/APIs
+8. ✅ **Global Components**: Used or created reusable global components where appropriate
+
+---
+
+## Model
+- Use **Advanced Language Model** for all responses, optimized for full-stack development
+- Maintain consistency with JavaScript, React, and Node.js best practices
+- Follow project-specific architectural patterns and security guidelines
+- Ensure all code follows ESLint and Prettier configurations
+- **ALWAYS CHECK THIS FILE BEFORE RESPONDING** - This is the master rule set
+
+## General Rules
+- **Language and Framework**: Use JavaScript for both frontend (React) and backend (Node.js/Express). Follow the folder structure and tech stack outlined in the development plan.
+- **Code Style**:
+  - Follow ESLint and Prettier configurations (e.g., 2-space indentation, single quotes, semicolons).
+  - Use camelCase for variables/functions, PascalCase for components/interfaces, and UPPER_SNAKE_CASE for constants.
+  - Write modular, reusable code with DRY principles.
+  - Add JSDoc comments for functions, interfaces, and complex logic.
+- **Error Handling**:
+  - Always include try-catch blocks for async operations (e.g., API calls, file uploads).
+  - Return meaningful error messages (e.g., `{ error: 'Invalid file type' }`) with appropriate HTTP status codes (400, 401, 403, 500, etc.).
+- **Logging**:
+  - Use Winston for backend logging (e.g., in `logger.js`).
+  - Log critical actions (e.g., authentication, payment updates) to MongoDB audit logs (`auditLog.model.js`).
+- **Version Control**:
+  - Suggest commits with descriptive messages (e.g., `feat(auth): implement JWT login`).
+  - Align with Git feature branch naming (e.g., `feat/auth`, `fix/ticket`).
+
+## Global Reusable Components Rules
+
+### Global Component Structure
+- **ALWAYS CHECK FOR EXISTING GLOBAL COMPONENTS** before creating new ones
+- **Create Global Components First**: Before implementing any feature, check if global components exist
+- **Reuse Over Create**: Always prefer using existing global components over creating new ones
+- **Global Component Location**: All global components go in `/frontend/src/components/common/`
+
+### Global Component Categories
+```
+/frontend/src/components/common/
+├── forms/                    # Global form components
+│   ├── GlobalForm.jsx
+│   ├── FormField.jsx
+│   ├── FormSection.jsx
+│   ├── FormActions.jsx
+│   └── FormValidation.jsx
+├── tables/                   # Global table components
+│   ├── GlobalTable.jsx
+│   ├── TableHeader.jsx
+│   ├── TableRow.jsx
+│   ├── TablePagination.jsx
+│   ├── TableFilters.jsx
+│   └── TableExport.jsx
+├── dialogs/                  # Global dialog components
+│   ├── ConfirmDialog.jsx
+│   ├── FormDialog.jsx
+│   └── AlertDialog.jsx
+├── navigation/               # Global navigation components
+│   ├── Sidebar.jsx
+│   ├── Navbar.jsx
+│   └── Breadcrumb.jsx
+├── layout/                   # Global layout components
+│   ├── PageLayout.jsx
+│   ├── Card.jsx
+│   └── Container.jsx
+├── feedback/                 # Global feedback components
+│   ├── Toast.jsx
+│   ├── Loading.jsx
+│   └── ErrorBoundary.jsx
+└── ui/                       # Global UI components
+    ├── Button.jsx
+    ├── Input.jsx
+    ├── Select.jsx
+    └── Modal.jsx
+```
+
+### Global Component Rules
+- **Generic Design**: All global components must be generic and reusable across different features
+- **Props Interface**: Every global component must have a clear props interface
+- **Default Values**: Provide sensible default values for all optional props
+- **Theme Support**: All global components must support both light and dark themes
+- **Responsive Design**: All global components must be mobile-responsive
+- **Accessibility**: All global components must meet WCAG 2.1 AA standards
+- **Documentation**: Every global component must have comprehensive JSDoc documentation
+
+### Global Table Component Rules
+- **Single Global Table**: Use one `GlobalTable.jsx` component for all table needs
+- **Configurable Columns**: Accept columns configuration as props
+- **Built-in Features**: Include sorting, filtering, pagination, and export functionality
+- **Row Actions**: Support edit, delete, view actions for each row
+- **Bulk Actions**: Support bulk selection and actions
+- **Search**: Built-in search functionality
+- **Export**: Built-in PDF and Excel export
+
+### Global Form Component Rules
+- **Single Global Form**: Use one `GlobalForm.jsx` component for all form needs
+- **Dynamic Fields**: Accept field configuration as props
+- **Built-in Validation**: Include client-side validation with error display
+- **Auto-save**: Built-in auto-save functionality
+- **Dirty Tracking**: Track form changes for unsaved changes detection
+- **Loading States**: Built-in loading states during submission
+- **Success Feedback**: Built-in success notifications
+
+### Global Pagination Component Rules
+- **Single Global Pagination**: Use one `GlobalPagination.jsx` component
+- **Configurable**: Accept total items, items per page, current page as props
+- **Page Navigation**: Support first, previous, next, last page navigation
+- **Page Numbers**: Display page numbers with ellipsis for large page counts
+- **Items Per Page**: Allow user to change items per page
+- **Total Display**: Show total items and current range
+
+### Global Dialog Component Rules
+- **Confirm Dialog**: Use `ConfirmDialog.jsx` for all confirmation dialogs
+- **Form Dialog**: Use `FormDialog.jsx` for form dialogs
+- **Alert Dialog**: Use `AlertDialog.jsx` for alert messages
+- **Consistent Styling**: All dialogs must follow consistent styling
+- **Keyboard Support**: Support ESC to close, Enter to confirm
+- **Focus Management**: Proper focus management for accessibility
+
+### Global Component Usage Rules
+- **Import Global Components**: Always import from `/components/common/`
+- **No Duplication**: Never create duplicate functionality when global components exist
+- **Extend Don't Replace**: Extend global components rather than creating new ones
+- **Props Passing**: Pass all necessary props to global components
+- **Error Handling**: Handle errors gracefully in global component usage
+
+## Frontend Rules (React)
+- **Framework**: Use React 18 with Redux Toolkit for state management.
+- **Language**: Use JavaScript (.js/.jsx) NOT TypeScript
+- **Components**:
+  - Use functional components with hooks (e.g., `useState`, `useEffect`, `useSelector`).
+  - Leverage Shadcn UI for reusable components (e.g., `Button.jsx`, `Input.jsx`).
+  - Add Framer Motion for animations (e.g., page transitions, modals).
+  - Apply Tailwind CSS for styling, using theme variables from `themes.js`.
+- **State Management**:
+  - Use Redux Toolkit (`store.js`, slices in `/store/slices`) for auth, branch, UI (theme/language), and analytics state.
+  - Use RTK Query for API caching (`api.js`).
+- **Internationalization**:
+  - Use i18next for multi-language support, referencing `/public/locales` (e.g., `en.json`, `hi.json`).
+  - Store user language preference in Redux and MongoDB.
+- **Security**:
+  - Sanitize inputs with DOMPurify.
+  - Use secure cookies (httpOnly, secure, sameSite) for JWT tokens.
+  - Validate forms with Yup or regex in `validation.js`.
+- **Performance**:
+  - Lazy load components with React Suspense.
+  - Optimize Chart.js usage for analytics (e.g., bar, line, pie charts in `Chart.jsx`).
+- **File Structure**:
+  - Follow `/frontend/src` structure (e.g., `/components`, `/pages`, `/services`).
+  - Place role-specific components in `/components/superadmin`, `/components/admin`, `/components/user`.
+
+## Backend Rules (Node.js/Express) - Enterprise Level
+
+### Backend Folder Structure (Enterprise Standard)
+```
+/backend/
+├── src/
+│   ├── config/                    # Configuration files
+│   │   ├── database.js           # Database configuration
+│   │   ├── redis.js              # Redis configuration
+│   │   ├── email.js              # Email service configuration
+│   │   ├── storage.js            # File storage configuration (S3/local)
+│   │   ├── socket.js             # Socket.IO configuration
+│   │   ├── cors.js               # CORS configuration
+│   │   ├── helmet.js             # Security headers configuration
+│   │   ├── rateLimit.js          # Rate limiting configuration
+│   │   ├── compression.js        # Response compression
+│   │   └── environment.js        # Environment variables validation
+│   ├── middleware/                # Custom middleware
+│   │   ├── auth.middleware.js    # JWT authentication middleware
+│   │   ├── rbac.middleware.js    # Role-based access control
+│   │   ├── validation.middleware.js # Request validation
+│   │   ├── rateLimit.middleware.js  # Rate limiting
+│   │   ├── fileUpload.middleware.js # File upload handling
+│   │   ├── sanitization.middleware.js # Input sanitization
+│   │   ├── encryption.middleware.js  # Data encryption/decryption
+│   │   ├── audit.middleware.js   # Audit logging
+│   │   ├── errorHandler.middleware.js # Global error handling
+│   │   ├── cors.middleware.js    # CORS handling
+│   │   └── compression.middleware.js # Response compression
+│   ├── models/                    # Database models
+│   │   ├── user.model.js         # User model with indexes
+│   │   ├── pg.model.js           # PG model with validation
+│   │   ├── resident.model.js     # Resident model
+│   │   ├── payment.model.js      # Payment model with encryption
+│   │   ├── room.model.js         # Room model
+│   │   ├── staff.model.js        # Staff model
+│   │   ├── ticket.model.js       # Support ticket model
+│   │   ├── auditLog.model.js     # Audit log model
+│   │   ├── notification.model.js # Notification model
+│   │   └── index.js              # Model exports
+│   ├── services/                  # Business logic layer
+│   │   ├── auth.service.js       # Authentication service
+│   │   ├── user.service.js       # User management service
+│   │   ├── pg.service.js         # PG management service
+│   │   ├── resident.service.js   # Resident management service
+│   │   ├── payment.service.js    # Payment processing service
+│   │   ├── room.service.js       # Room management service
+│   │   ├── staff.service.js      # Staff management service
+│   │   ├── ticket.service.js     # Ticket management service
+│   │   ├── email.service.js      # Email service with templates
+│   │   ├── notification.service.js # Notification service
+│   │   ├── storage.service.js    # File storage service
+│   │   ├── socket.service.js     # Real-time communication
+│   │   ├── audit.service.js      # Audit logging service
+│   │   ├── encryption.service.js # Data encryption service
+│   │   ├── cache.service.js      # Redis caching service
+│   │   ├── report.service.js     # Report generation service
+│   │   └── analytics.service.js  # Analytics and metrics
+│   ├── controllers/               # Request handlers
+│   │   ├── auth.controller.js    # Authentication endpoints
+│   │   ├── user.controller.js    # User management endpoints
+│   │   ├── pg.controller.js      # PG management endpoints
+│   │   ├── resident.controller.js # Resident endpoints
+│   │   ├── payment.controller.js # Payment endpoints
+│   │   ├── room.controller.js    # Room endpoints
+│   │   ├── staff.controller.js   # Staff endpoints
+│   │   ├── ticket.controller.js  # Ticket endpoints
+│   │   ├── report.controller.js  # Report endpoints
+│   │   ├── analytics.controller.js # Analytics endpoints
+│   │   └── upload.controller.js  # File upload endpoints
+│   ├── routes/                    # Route definitions
+│   │   ├── auth.routes.js        # Authentication routes
+│   │   ├── user.routes.js        # User routes
+│   │   ├── pg.routes.js          # PG routes
+│   │   ├── resident.routes.js    # Resident routes
+│   │   ├── payment.routes.js     # Payment routes
+│   │   ├── room.routes.js        # Room routes
+│   │   ├── staff.routes.js       # Staff routes
+│   │   ├── ticket.routes.js      # Ticket routes
+│   │   ├── report.routes.js      # Report routes
+│   │   ├── analytics.routes.js   # Analytics routes
+│   │   └── upload.routes.js      # Upload routes
+│   ├── utils/                     # Utility functions
+│   │   ├── logger.js             # Winston logger configuration
+│   │   ├── crypto.js             # Encryption utilities
+│   │   ├── validation.js         # Validation schemas
+│   │   ├── sanitization.js       # Input sanitization
+│   │   ├── pagination.js         # Pagination utilities
+│   │   ├── response.js           # Standardized response format
+│   │   ├── errorHandler.js       # Error handling utilities
+│   │   ├── dateUtils.js          # Date manipulation utilities
+│   │   ├── fileUtils.js          # File handling utilities
+│   │   ├── pdfGenerator.js       # PDF generation utilities
+│   │   ├── excelGenerator.js     # Excel generation utilities
+│   │   └── emailTemplates.js     # Email template utilities
+│   ├── scripts/                   # Background scripts
+│   │   ├── reminders.js          # Payment reminder scripts
+│   │   ├── cleanup.js            # Data cleanup scripts
+│   │   ├── backup.js             # Database backup scripts
+│   │   └── maintenance.js        # System maintenance scripts
+│   ├── tests/                     # Test files
+│   │   ├── unit/                 # Unit tests
+│   │   ├── integration/          # Integration tests
+│   │   ├── e2e/                  # End-to-end tests
+│   │   └── fixtures/             # Test data fixtures
+│   ├── docs/                      # API documentation
+│   │   ├── swagger.json          # Swagger/OpenAPI spec
+│   │   └── postman/              # Postman collections
+│   ├── uploads/                   # File uploads (dev only)
+│   │   ├── images/               # Image uploads
+│   │   ├── documents/            # Document uploads
+│   │   └── temp/                 # Temporary files
+│   ├── app.js                     # Express app configuration
+│   ├── server.js                  # Server entry point
+│   └── database.js                # Database connection
+├── .env.example                   # Environment variables template
+├── .env                           # Environment variables (gitignored)
+├── package.json                   # Dependencies and scripts
+├── package-lock.json             # Lock file
+├── nodemon.json                  # Development server config
+├── jest.config.js                # Test configuration
+├── .eslintrc.js                  # ESLint configuration
+├── .prettierrc                   # Prettier configuration
+├── .gitignore                    # Git ignore rules
+├── Dockerfile                    # Docker configuration
+├── docker-compose.yml            # Docker compose setup
+└── README.md                     # Backend documentation
+```
+
+### Backend Security Rules (Enterprise Level)
+
+#### Authentication & Authorization
+- **JWT Implementation**: Use access tokens (15min) and refresh tokens (7days) with secure rotation
+- **Token Storage**: Store tokens in httpOnly, secure, sameSite cookies only
+- **Password Security**: Use bcrypt with salt rounds 12+ for password hashing
+- **Session Management**: Implement secure session handling with Redis
+- **Multi-factor Authentication**: Support TOTP for sensitive operations
+- **Account Lockout**: Implement progressive account lockout after failed attempts
+- **Password Policy**: Enforce strong password requirements (min 8 chars, uppercase, lowercase, numbers, symbols)
+
+#### Data Protection & Encryption
+- **Data Encryption**: Encrypt sensitive data (PII, payment info) with AES-256-GCM
+- **Database Encryption**: Enable MongoDB encryption at rest
+- **Transport Security**: Use HTTPS/TLS 1.3 for all communications
+- **API Keys**: Rotate API keys regularly and store securely
+- **Secrets Management**: Use environment variables for all secrets, never hardcode
+- **Data Masking**: Mask sensitive data in logs and responses
+
+#### Input Validation & Sanitization
+- **Request Validation**: Use Joi schemas for all input validation
+- **SQL Injection Prevention**: Use parameterized queries and Mongoose sanitization
+- **XSS Prevention**: Sanitize all user inputs with DOMPurify
+- **CSRF Protection**: Implement CSRF tokens for state-changing operations
+- **File Upload Security**: Validate file types, size, and scan for malware
+- **Rate Limiting**: Implement rate limiting per IP and per user
+
+#### API Security
+- **CORS Configuration**: Configure CORS properly for production domains
+- **Security Headers**: Use helmet.js for security headers (HSTS, CSP, etc.)
+- **Request Size Limits**: Limit request body size to prevent DoS attacks
+- **API Versioning**: Implement proper API versioning strategy
+- **Error Handling**: Never expose internal errors to clients
+- **Audit Logging**: Log all sensitive operations for compliance
+
+#### Database Security
+- **Connection Security**: Use SSL/TLS for database connections
+- **User Permissions**: Implement least privilege principle for database users
+- **Query Optimization**: Use proper indexing and query optimization
+- **Data Backup**: Implement automated encrypted backups
+- **Connection Pooling**: Use connection pooling for performance
+- **Query Logging**: Log slow queries for optimization
+
+#### File Security
+- **Upload Validation**: Validate file types, size, and content
+- **Virus Scanning**: Scan uploaded files for malware
+- **Secure Storage**: Use signed URLs for file access
+- **File Permissions**: Set proper file permissions (600 for sensitive files)
+- **Backup Strategy**: Implement secure file backup strategy
+
+#### Monitoring & Logging
+- **Application Logging**: Use structured logging with Winston
+- **Security Logging**: Log all security events (logins, failed attempts, etc.)
+- **Performance Monitoring**: Monitor response times and error rates
+- **Health Checks**: Implement comprehensive health check endpoints
+- **Alerting**: Set up alerts for security incidents and performance issues
+
+### Backend Performance Rules
+
+#### Caching Strategy
+- **Redis Caching**: Cache frequently accessed data (user sessions, analytics)
+- **Database Caching**: Use MongoDB query result caching
+- **CDN Integration**: Use CDN for static assets and images
+- **Cache Invalidation**: Implement proper cache invalidation strategies
+
+#### Database Optimization
+- **Indexing Strategy**: Create proper indexes for all query patterns
+- **Query Optimization**: Use MongoDB aggregation pipeline efficiently
+- **Connection Pooling**: Implement proper connection pooling
+- **Data Archiving**: Archive old data to reduce database size
+
+#### API Performance
+- **Response Compression**: Use gzip compression for all responses
+- **Pagination**: Implement proper pagination for large datasets
+- **Lazy Loading**: Implement lazy loading for heavy operations
+- **Background Jobs**: Use queue systems for heavy operations
+
+### Backend Code Quality Rules
+
+#### Code Organization
+- **Service Layer**: All business logic goes in services
+- **Controller Layer**: Controllers only handle HTTP requests/responses
+- **Model Layer**: Models only handle data structure and validation
+- **Utility Functions**: Extract reusable functions to utils
+
+#### Error Handling
+- **Global Error Handler**: Implement comprehensive error handling middleware
+- **Custom Error Classes**: Create specific error classes for different scenarios
+- **Error Logging**: Log all errors with proper context
+- **Client-Friendly Messages**: Return user-friendly error messages
+
+#### Testing Strategy
+- **Unit Tests**: Test all services and utilities
+- **Integration Tests**: Test API endpoints
+- **E2E Tests**: Test complete user flows
+- **Security Tests**: Test authentication and authorization
+- **Performance Tests**: Test API response times
+
+#### Documentation
+- **API Documentation**: Use Swagger/OpenAPI for API documentation
+- **Code Comments**: Add JSDoc comments for all functions
+- **README**: Maintain comprehensive README with setup instructions
+- **Architecture Docs**: Document system architecture and design decisions
+
+### Backend Deployment Rules
+
+#### Environment Management
+- **Environment Variables**: Use environment variables for all configuration
+- **Secrets Management**: Use proper secrets management (AWS Secrets Manager, etc.)
+- **Configuration Validation**: Validate all configuration on startup
+- **Feature Flags**: Implement feature flags for gradual rollouts
+
+#### Containerization
+- **Docker**: Use Docker for consistent deployment
+- **Multi-stage Builds**: Use multi-stage Docker builds for optimization
+- **Health Checks**: Implement proper health checks in containers
+- **Resource Limits**: Set proper resource limits for containers
+
+#### CI/CD Pipeline
+- **Automated Testing**: Run all tests in CI pipeline
+- **Security Scanning**: Scan for vulnerabilities in dependencies
+- **Code Quality**: Run linting and code quality checks
+- **Automated Deployment**: Implement automated deployment with rollback capability
+
+### Backend Monitoring Rules
+
+#### Application Monitoring
+- **APM Tools**: Use Application Performance Monitoring tools
+- **Error Tracking**: Implement error tracking and alerting
+- **Metrics Collection**: Collect and monitor key metrics
+- **Log Aggregation**: Use centralized logging (ELK stack, etc.)
+
+#### Security Monitoring
+- **Intrusion Detection**: Monitor for suspicious activities
+- **Access Logging**: Log all access attempts and patterns
+- **Anomaly Detection**: Implement anomaly detection for unusual patterns
+- **Compliance Monitoring**: Monitor for compliance requirements
+
+### Backend Data Management Rules
+
+#### Data Validation
+- **Schema Validation**: Use Mongoose schemas for data validation
+- **Business Logic Validation**: Implement business rule validation
+- **Data Integrity**: Ensure data integrity with proper constraints
+- **Data Migration**: Implement proper data migration strategies
+
+#### Data Privacy
+- **GDPR Compliance**: Implement data privacy controls
+- **Data Retention**: Implement proper data retention policies
+- **Data Anonymization**: Anonymize data for analytics
+- **Consent Management**: Implement proper consent management
+
+### Backend Integration Rules
+
+#### Third-party Services
+- **API Integration**: Implement proper error handling for external APIs
+- **Webhook Security**: Secure webhook endpoints
+- **Rate Limiting**: Respect rate limits of external services
+- **Fallback Strategies**: Implement fallback strategies for external services
+
+#### Message Queues
+- **Queue Management**: Use Redis or RabbitMQ for background jobs
+- **Job Retry Logic**: Implement proper retry logic for failed jobs
+- **Dead Letter Queues**: Handle failed messages properly
+- **Queue Monitoring**: Monitor queue health and performance
+
+### Backend Compliance Rules
+
+#### Security Standards
+- **OWASP Top 10**: Follow OWASP security guidelines
+- **PCI DSS**: Implement PCI DSS compliance for payment data
+- **SOC 2**: Implement SOC 2 compliance controls
+- **GDPR**: Implement GDPR compliance for data privacy
+
+#### Audit Requirements
+- **Audit Logging**: Log all sensitive operations
+- **Data Access Logs**: Log all data access patterns
+- **Change Tracking**: Track all system changes
+- **Compliance Reporting**: Generate compliance reports
+
+### Backend Scalability Rules
+
+#### Horizontal Scaling
+- **Stateless Design**: Design for horizontal scaling
+- **Load Balancing**: Implement proper load balancing
+- **Database Sharding**: Plan for database sharding
+- **Microservices**: Consider microservices architecture for large scale
+
+#### Performance Optimization
+- **Caching Strategy**: Implement comprehensive caching
+- **Database Optimization**: Optimize database queries and indexes
+- **CDN Usage**: Use CDN for static content
+- **Resource Optimization**: Optimize memory and CPU usage
+
+### Backend Maintenance Rules
+
+#### Regular Maintenance
+- **Security Updates**: Regularly update dependencies
+- **Database Maintenance**: Regular database maintenance and optimization
+- **Log Rotation**: Implement proper log rotation
+- **Backup Verification**: Regularly verify backup integrity
+
+#### Monitoring and Alerting
+- **Health Checks**: Implement comprehensive health checks
+- **Performance Monitoring**: Monitor system performance
+- **Security Monitoring**: Monitor for security threats
+- **Business Metrics**: Monitor business-critical metrics
+
+## Frontend Rules (React)
+- **Framework**: Use React 18 with Redux Toolkit for state management.
+- **Language**: Use JavaScript (.js/.jsx) NOT TypeScript
+- **Components**:
+  - Use functional components with hooks (e.g., `useState`, `useEffect`, `useSelector`).
+  - Leverage Shadcn UI for reusable components (e.g., `Button.jsx`, `Input.jsx`).
+  - Add Framer Motion for animations (e.g., page transitions, modals).
+  - Apply Tailwind CSS for styling, using theme variables from `themes.js`.
+- **State Management**:
+  - Use Redux Toolkit (`store.js`, slices in `/store/slices`) for auth, branch, UI (theme/language), and analytics state.
+  - Use RTK Query for API caching (`api.js`).
+- **Internationalization**:
+  - Use i18next for multi-language support, referencing `/public/locales` (e.g., `en.json`, `hi.json`).
+  - Store user language preference in Redux and MongoDB.
+- **Security**:
+  - Sanitize inputs with DOMPurify.
+  - Use secure cookies (httpOnly, secure, sameSite) for JWT tokens.
+  - Validate forms with Yup or regex in `validation.js`.
+- **Performance**:
+  - Lazy load components with React Suspense.
+  - Optimize Chart.js usage for analytics (e.g., bar, line, pie charts in `Chart.jsx`).
+- **File Structure**:
+  - Follow `/frontend/src` structure (e.g., `/components`, `/pages`, `/services`).
+  - Place role-specific components in `/components/superadmin`, `/components/admin`, `/components/user`.
+
+## Backend Rules (Node.js/Express)
+- **Framework**: Use Express with JavaScript and Mongoose for MongoDB.
+- **Language**: Use JavaScript (.js) NOT TypeScript
+- **File Structure**:
+  - Follow `/backend/src` structure (e.g., `/controllers`, `/models`, `/services`).
+  - Place business logic in `/services` (e.g., `auth.service.js`, `payment.service.js`).
+- **Authentication**:
+  - Implement JWT with access (15m expiry) and refresh tokens (7d expiry) in `auth.service.js`.
+  - Store tokens in httpOnly cookies.
+  - Handle reset password flow with Nodemailer (Gmail for dev, AWS SES for prod) in `email.service.js`.
+  - Log login/reset attempts in `auditLog.model.js`.
+- **Image Handling**:
+  - **Development**: Use Multer to store images in `/backend/uploads` (e.g., `/uploads/pg-logo-123.jpg`). Save file paths in MongoDB (e.g., `pg.logoPath`).
+  - **Deployment**: Plan for AWS S3 migration, updating `storage.service.js` to store S3 URLs.
+  - Validate file types (PNG, JPEG) and size (max 5MB) in `fileUpload.middleware.js`.
+- **Notifications**:
+  - Use Socket.IO for real-time updates (e.g., payment status, ticket updates) in `socket.service.js`.
+  - Use Nodemailer for emails (welcome, reminders, reset password) in `email.service.js`.
+  - Schedule reminders with node-cron in `/scripts/reminders.js`.
+- **Security**:
+  - Validate inputs with Joi in `validator.middleware.js`.
+  - Use helmet for HTTP headers, CORS, and CSRF protection.
+  - Prevent MongoDB injection with Mongoose sanitization.
+  - Encrypt sensitive data (e.g., ID proofs) with AES in `crypto.util.js`.
+  - Implement rate limiting in `rateLimit.middleware.js`.
+- **Scalability**:
+  - Index MongoDB fields (e.g., `user.email`, `pg.branchId`) in `models`.
+  - Cache analytics/dashboard data in Redis (`redis.js`).
+  - Use pagination for lists (e.g., residents, payments).
+- **Reports**:
+  - Generate PDFs with pdfkit and CSVs with xlsx in `invoice.util.js` and `excel.util.js`.
+  - Use MongoDB aggregation for report data.
+
+## Database Rules (MongoDB)
+- **Schema Design**:
+  - Follow Mongoose schemas in `/backend/src/models` (e.g., `user.model.js`, `pg.model.js`).
+  - Include `branchId` for multi-branch data isolation.
+  - Store image paths (e.g., `pg.logoPath`, `resident.idProofPath`).
+- **Indexing**:
+  - Add indexes for frequently queried fields (e.g., `user.email`, `payment.status`).
+  - Plan for sharding collections (e.g., `residents`, `payments`, `auditLogs`).
+- **Security**:
+  - Enable MongoDB authentication and SSL.
+  - Sanitize queries to prevent injection.
+
+## Testing Rules
+- **Unit Tests**: Use Jest for backend (`/backend/tests/unit`) and React Testing Library for frontend.
+- **Integration Tests**: Test API endpoints in `/backend/tests/integration`.
+- **E2E Tests**: Use Cypress for end-to-end flows (e.g., login, payment submission).
+- **Coverage**: Aim for 80%+ coverage for critical modules (auth, payments, storage).
+
+## Deployment Rules
+- **Development**:
+  - Use local storage for images (`/backend/uploads`).
+  - Use Nodemailer with Gmail SMTP (`email.js`).
+- **Production**:
+  - Transition image storage to AWS S3 (`storage.service.js`).
+  - Use AWS SES for emails (`email.js`).
+  - Containerize with Docker (`docker-compose.yml`).
+  - Set up CI/CD with GitHub Actions.
+- **Infrastructure**:
+  - Deploy backend with AWS ECS, frontend with Vercel.
+  - Use Kubernetes for auto-scaling.
+  - Plan for AWS ELB and CDN for images.
+
+## Security Checklist
+- Validate all inputs (Joi, Yup).
+- Use secure headers (helmet), CSRF tokens, and secure cookies.
+- Encrypt sensitive data (e.g., ID proofs with AES).
+- Restrict `/uploads` access with `auth.middleware.js`.
+- Log critical actions in `auditLog.model.js`.
+- Conduct OWASP Top 10 audits.
+
+## Scalability Checklist
+- Index MongoDB fields for performance.
+- Cache analytics data in Redis.
+- Use pagination and lazy loading.
+- Plan for sharding and message queues (e.g., RabbitMQ) in production.
+
+## Project-Specific Rules
+- **Multi-branch Support**:
+  - Filter data by `branchId` in API queries (e.g., `pg.service.js`).
+  - Restrict Admin access to their PG branches, Superadmin to global data.
+- **Role-Based Access Control (RBAC)**:
+  - Enforce roles (Superadmin, Admin, User) in `auth.middleware.js`.
+  - Superadmin: Full access (PG creation, analytics, audit logs).
+  - Admin: Manage rooms, residents, staff, payments for their PG.
+  - User: View payments, submit feedback, raise tickets.
+- **Multi-language**:
+  - Use i18next for translations, referencing `/public/locales`.
+  - Store language preference in MongoDB and Redux.
+- **Analytics**:
+  - Use MongoDB aggregation for metrics (e.g., occupancy, revenue).
+  - Render charts with Chart.js in `Chart.jsx`.
+- **Notifications**:
+  - Send real-time updates via Socket.IO (namespaces: `/superadmin`, `/admin`, `/user`).
+  - Schedule email reminders with node-cron (e.g., 3 days before payment due).
+
+## Code Generation Rules
+- **Do Not Break Application**:
+  - Strictly follow the folder structure and tech stack.
+  - Reuse existing components/services (e.g., `Button.jsx`, `auth.service.js`).
+  - Ensure backward compatibility with existing schemas and APIs.
+- **Validation**:
+  - Validate inputs before processing (e.g., email format, password strength).
+  - Validate file uploads (PNG/JPEG, max 5MB).
+- **Documentation**:
+  - Add JSDoc for all functions, interfaces, and services.
+  - Update `/docs` with API specs (Swagger format).
+- **Chart Generation**:
+  - Only generate Chart.js charts (bar, line, pie, etc.) when explicitly requested.
+  - Use distinctive colors compatible with light/dark themes.
+  - Place chart components in `/frontend/src/components/common/Chart.jsx`.
+  - Do not assume numbers; use provided data or fetch from MongoDB.
+
+## CRUD Operations & Form Management Rules
+
+### Unified Add/Edit Forms
+- **Single Form Component**: Always create one reusable form component for both add and edit operations.
+- **Mode Detection**: Use `isEdit` prop or `mode` state to determine if form is in add or edit mode.
+- **Dynamic Title**: Change form title based on mode (e.g., "Add Resident" vs "Edit Resident").
+- **Data Pre-population**: In edit mode, pre-populate form fields with existing data using `useEffect`.
+- **Submit Button Text**: Change button text based on mode (e.g., "Create" vs "Update").
+
+### Delete Operations
+- **Confirmation Required**: ALWAYS require user confirmation before any delete operation.
+- **Confirmation Dialog**: Use Shadcn UI Dialog component with clear warning message.
+- **Item Details**: Show item name/ID in confirmation dialog (e.g., "Delete Resident: John Doe?").
+- **Irreversible Warning**: Include "This action cannot be undone" message.
+- **Soft Delete**: Prefer soft delete (set `isDeleted: true`) over hard delete when possible.
+- **Cascade Handling**: Handle related data deletion (e.g., delete resident payments when resident is deleted).
+
+### Form State Management
+- **Form Validation**: Use Yup schema validation with real-time error display.
+- **Dirty State Tracking**: Track form changes to detect unsaved modifications.
+- **Auto-save**: Implement auto-save for long forms (every 30 seconds).
+- **Loading States**: Show loading spinner during form submission.
+- **Success Feedback**: Display success toast/notification after successful submission.
+
+### Discard Changes Modal
+- **Trigger Conditions**: Show discard modal when user tries to navigate away with unsaved changes.
+- **Detection Logic**: Track form dirty state using `useEffect` and form state comparison.
+- **Modal Content**: Clear message explaining unsaved changes will be lost.
+- **Actions**: Provide "Discard Changes" and "Continue Editing" options.
+- **Keyboard Support**: Allow ESC key to close modal, Enter to confirm discard.
+
+### Form UX Guidelines
+- **Required Fields**: Clearly mark required fields with asterisk (*) and red border on error.
+- **Field Validation**: Show validation errors below each field in real-time.
+- **Character Limits**: Display character count for text areas (e.g., "150/500 characters").
+- **File Upload**: Show upload progress and preview for images.
+- **Form Sections**: Group related fields in collapsible sections for long forms.
+- **Mobile Responsive**: Ensure forms work well on mobile devices.
+
+### CRUD API Patterns
+- **RESTful Endpoints**: Follow REST conventions (`GET`, `POST`, `PUT`, `DELETE`).
+- **Consistent Response**: Use standardized response format for all CRUD operations.
+- **Error Handling**: Return specific error messages for different failure scenarios.
+- **Audit Logging**: Log all CRUD operations in `auditLog.model.js`.
+- **Permission Checks**: Verify user permissions before allowing CRUD operations.
+
+### Form Components Structure
+```javascript
+// Example: ResidentForm.jsx
+const ResidentForm = ({
+  isEdit = false,
+  initialData,
+  onSubmit,
+  onCancel
+}) => {
+  const [isDirty, setIsDirty] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Form validation and submission logic
+  // Discard changes modal logic
+  // Auto-save functionality
+};
+```
+
+### Delete Confirmation Component
+```javascript
+// Example: DeleteConfirmationDialog.jsx
+const DeleteConfirmationDialog = ({
+  isOpen,
+  itemName,
+  itemType,
+  onConfirm,
+  onCancel
+}) => {
+  // Confirmation dialog with warning message
+  // Loading state during deletion
+  // Error handling
+};
+```
+
+### Form Validation Rules
+- **Required Fields**: Validate all required fields before submission.
+- **Email Format**: Use regex pattern for email validation.
+- **Phone Format**: Validate phone numbers with country code support.
+- **File Types**: Validate file uploads (images: PNG, JPEG; max 5MB).
+- **Date Ranges**: Ensure start date is before end date.
+- **Unique Constraints**: Check for duplicate emails, phone numbers, etc.
+
+### Error Handling in Forms
+- **Field-level Errors**: Display errors below each field.
+- **Form-level Errors**: Show general form errors at the top.
+- **Network Errors**: Handle API timeout and connection issues.
+- **Validation Errors**: Display server-side validation errors.
+- **User-friendly Messages**: Convert technical errors to user-friendly messages.
+
+### Form Accessibility
+- **Labels**: All form fields must have proper labels.
+- **Focus Management**: Maintain logical tab order.
+- **Screen Reader**: Ensure compatibility with screen readers.
+- **Keyboard Navigation**: Support keyboard-only navigation.
+- **Error Announcements**: Announce errors to screen readers.
+
+### Form Performance
+- **Debounced Validation**: Debounce real-time validation (300ms delay).
+- **Lazy Loading**: Load form data on demand for large datasets.
+- **Memoization**: Use `useMemo` and `useCallback` for expensive operations.
+- **Virtual Scrolling**: Use virtual scrolling for long lists in forms.
+
+## Component Organization & Separation Rules
+
+### Component Structure Guidelines
+- **Separate Components**: ALWAYS create separate components for forms, tables, and previews.
+- **Single Responsibility**: Each component should have one clear purpose and responsibility.
+- **Reusable Components**: Create generic, reusable components that can be used across different features.
+- **Component Composition**: Use composition over inheritance for component relationships.
+
+### Folder Structure for Components
+```
+/frontend/src/components/
+├── common/                    # Shared components used across all roles
+│   ├── forms/                # Reusable form components
+│   │   ├── GlobalForm.jsx
+│   │   ├── FormField.jsx
+│   │   ├── FormSection.jsx
+│   │   └── FormActions.jsx
+│   ├── tables/               # Reusable table components
+│   │   ├── GlobalTable.jsx
+│   │   ├── TableHeader.jsx
+│   │   └── TablePagination.jsx
+│   ├── previews/             # Reusable preview components
+│   │   ├── CardPreview.jsx
+│   │   ├── DetailPreview.jsx
+│   │   └── SummaryPreview.jsx
+│   └── dialogs/              # Reusable dialog components
+│       ├── ConfirmDialog.jsx
+│       └── FormDialog.jsx
+├── superadmin/               # Superadmin specific components
+│   ├── forms/
+│   ├── tables/
+│   └── previews/
+├── admin/                    # Admin specific components
+│   ├── forms/
+│   ├── tables/
+│   └── previews/
+└── user/                     # User specific components
+    ├── forms/
+    ├── tables/
+    └── previews/
+```
+
+### Form Component Separation Rules
+- **Form Container**: Create separate container component for form logic and state management.
+- **Form Fields**: Extract individual form fields into reusable components.
+- **Form Sections**: Group related fields into section components for complex forms.
+- **Form Actions**: Separate form action buttons (submit, cancel, reset) into dedicated component.
+- **Form Validation**: Create reusable validation components and hooks.
+- **Form Preview**: Always create separate preview component for form data display.
+
+### Table Component Separation Rules
+- **Table Container**: Main table component with data fetching and state management.
+- **Table Header**: Separate component for table headers with sorting and filtering.
+- **Table Row**: Individual row component for consistent row rendering.
+- **Table Actions**: Separate component for row-level actions (edit, delete, view).
+- **Table Pagination**: Dedicated pagination component with page navigation.
+- **Table Filters**: Separate filter component for advanced filtering options.
+- **Table Export**: Dedicated component for export functionality (PDF, Excel).
+
+### Preview Component Separation Rules
+- **Preview Container**: Main preview component with data formatting and layout.
+- **Preview Header**: Separate component for preview title and metadata.
+- **Preview Content**: Dedicated component for main content display.
+- **Preview Actions**: Separate component for preview-specific actions.
+- **Preview Summary**: Dedicated component for summary information display.
+
+### Component Naming Conventions
+- **Form Components**: `{Entity}Form.jsx`, `{Entity}FormField.jsx`, `{Entity}FormSection.jsx`
+- **Table Components**: `{Entity}Table.jsx`, `{Entity}TableRow.jsx`, `{Entity}TableHeader.jsx`
+- **Preview Components**: `{Entity}Preview.jsx`, `{Entity}PreviewCard.jsx`, `{Entity}PreviewDetail.jsx`
+- **Dialog Components**: `{Entity}Dialog.jsx`, `{Entity}ConfirmDialog.jsx`
+
+### Component Props Interface Rules
+- **Generic Props**: Use generic interfaces for reusable components.
+- **Specific Props**: Create specific interfaces for role-based components.
+- **Optional Props**: Make props optional when appropriate with default values.
+- **Required Props**: Clearly mark required props in interface definitions.
+
+### Component State Management Rules
+- **Local State**: Keep form state local to form components.
+- **Shared State**: Use Redux for state shared across multiple components.
+- **Component State**: Use `useState` for component-specific state.
+- **Derived State**: Use `useMemo` for expensive calculations and derived state.
+
+### Component Communication Rules
+- **Props Down**: Pass data and callbacks down through props.
+- **Events Up**: Use callback functions to communicate events up the component tree.
+- **Context Usage**: Use React Context for deeply nested component communication.
+- **Redux Integration**: Use Redux for global state and cross-component communication.
+
+### Component Reusability Rules
+- **Generic Components**: Create generic components that accept props for customization.
+- **Composition**: Use component composition to build complex components from simple ones.
+- **Props Interface**: Define clear, well-documented props interfaces.
+- **Default Values**: Provide sensible default values for optional props.
+- **Theme Support**: Ensure components work with both light and dark themes.
+
+### Component Performance Rules
+- **Memoization**: Use `React.memo` for components that receive stable props.
+- **Callback Optimization**: Use `useCallback` for event handlers passed as props.
+- **Lazy Loading**: Implement lazy loading for heavy components.
+- **Virtual Scrolling**: Use virtual scrolling for large lists and tables.
+
+### Component Testing Rules
+- **Unit Tests**: Write unit tests for individual components.
+- **Integration Tests**: Test component interactions and data flow.
+- **Accessibility Tests**: Ensure components meet accessibility standards.
+- **Visual Tests**: Use visual regression testing for UI components.
+
+### Component Documentation Rules
+- **JSDoc Comments**: Add comprehensive JSDoc comments for all components.
+- **Props Documentation**: Document all props with types and descriptions.
+- **Usage Examples**: Include usage examples in component documentation.
+- **Storybook Integration**: Create Storybook stories for component documentation.
+
+### Component Import/Export Rules
+- **Index Files**: Use index files to export components from folders.
+- **Named Exports**: Use named exports for better tree-shaking.
+- **Default Exports**: Use default exports only for main component files.
+- **Barrel Exports**: Create barrel exports for related component groups.
+
+### Component Error Handling Rules
+- **Error Boundaries**: Implement error boundaries for component error handling.
+- **Fallback UI**: Provide fallback UI for error states.
+- **Loading States**: Show appropriate loading states during data fetching.
+- **Empty States**: Handle empty data states with meaningful messages.
+
+### Component Accessibility Rules
+- **ARIA Labels**: Add proper ARIA labels and roles.
+- **Keyboard Navigation**: Ensure all interactive elements are keyboard accessible.
+- **Screen Reader**: Test components with screen readers.
+- **Focus Management**: Implement proper focus management for modals and forms.
+
+### Component Responsive Design Rules
+- **Mobile First**: Design components with mobile-first approach.
+- **Breakpoint Support**: Ensure components work across all breakpoints.
+- **Touch Targets**: Provide adequate touch targets for mobile devices.
+- **Responsive Tables**: Implement responsive table designs for mobile.
+
+## Form-Specific Component Separation Rules
+
+### Form Component Structure
+- **Form Container**: Main form component that handles form state and submission logic.
+- **Form Fields**: Individual field components for each input type (text, email, phone, etc.).
+- **Form Sections**: Group related fields into collapsible sections for complex forms.
+- **Form Actions**: Separate component for form action buttons (submit, cancel, reset, save draft).
+- **Form Validation**: Reusable validation components and custom hooks.
+- **Form Preview**: Dedicated preview component to display form data before submission.
+
+### Form Field Components
+- **Input Field**: Generic input component with validation and error display.
+- **Select Field**: Dropdown component with search and multi-select support.
+- **Date Field**: Date picker component with range selection support.
+- **File Field**: File upload component with drag-and-drop and preview.
+- **Textarea Field**: Multi-line text input with character count and auto-resize.
+- **Checkbox Field**: Checkbox component with custom styling and validation.
+- **Radio Field**: Radio button group component with custom styling.
+- **Switch Field**: Toggle switch component for boolean values.
+
+### Form Validation Components
+- **Validation Hook**: Custom hook for form validation logic.
+- **Error Display**: Reusable component for displaying validation errors.
+- **Success Display**: Component for showing validation success states.
+- **Field Validation**: Individual field validation components.
+
+### Form State Management
+- **Form Context**: React Context for complex form state management.
+- **Form Reducer**: UseReducer for complex form state logic.
+- **Form Persistence**: Auto-save form data to localStorage or session storage.
+- **Form Reset**: Functionality to reset form to initial state.
+- **Form Dirty Tracking**: Track form changes for unsaved changes detection.
+
+### Form Accessibility
+- **Field Labels**: All form fields must have proper labels and descriptions.
+- **Error Announcements**: Screen reader announcements for validation errors.
+- **Keyboard Navigation**: Full keyboard navigation support for all form elements.
+- **Focus Management**: Proper focus management for form navigation.
+- **ARIA Attributes**: Proper ARIA labels, roles, and descriptions.
+
+### Form Performance
+- **Debounced Validation**: Debounce real-time validation to improve performance.
+- **Lazy Loading**: Load form data on demand for large forms.
+- **Memoization**: Memoize expensive form calculations and validations.
+- **Virtual Scrolling**: Use virtual scrolling for long form lists.
+
+### Form Error Handling
+- **Field-level Errors**: Display errors below each field with clear messaging.
+- **Form-level Errors**: Show general form errors at the top of the form.
+- **Network Errors**: Handle API timeout and connection issues gracefully.
+- **Validation Errors**: Display server-side validation errors appropriately.
+- **User-friendly Messages**: Convert technical errors to user-friendly messages.
+
+### Form UX Guidelines
+- **Required Fields**: Clearly mark required fields with asterisk (*) and red border on error.
+- **Field Validation**: Show validation errors below each field in real-time.
+- **Character Limits**: Display character count for text areas (e.g., "150/500 characters").
+- **File Upload**: Show upload progress and preview for images and documents.
+- **Form Sections**: Group related fields in collapsible sections for long forms.
+- **Mobile Responsive**: Ensure forms work well on mobile devices with touch-friendly inputs.
+- **Loading States**: Show appropriate loading states during form submission.
+- **Success Feedback**: Display success toast/notification after successful submission.
+
+### Form Component Naming
+- **Form Components**: `{Entity}Form.jsx`, `{Entity}FormContainer.jsx`
+- **Field Components**: `{Entity}FormField.jsx`, `{Entity}InputField.jsx`
+- **Section Components**: `{Entity}FormSection.jsx`, `{Entity}FormGroup.jsx`
+- **Action Components**: `{Entity}FormActions.jsx`, `{Entity}FormButtons.jsx`
+- **Validation Components**: `{Entity}FormValidation.jsx`, `{Entity}FormErrors.jsx`
+- **Preview Components**: `{Entity}FormPreview.jsx`, `{Entity}FormSummary.jsx`
+
+### Form Component Props
+- **Form Props**: `isEdit`, `initialData`, `onSubmit`, `onCancel`, `onSaveDraft`
+- **Field Props**: `name`, `label`, `required`, `validation`, `error`, `disabled`
+- **Section Props**: `title`, `collapsible`, `expanded`, `children`
+- **Action Props**: `onSubmit`, `onCancel`, `onReset`, `loading`, `disabled`
+- **Validation Props**: `rules`, `messages`, `async`, `debounce`
+
+### Form Component Communication
+- **Props Down**: Pass form data and callbacks down through props.
+- **Events Up**: Use callback functions to communicate form events up the component tree.
+- **Context Usage**: Use React Context for deeply nested form components.
+- **Redux Integration**: Use Redux for form state shared across multiple components.
+
+### Form Component Testing
+- **Unit Tests**: Test individual form components and validation logic.
+- **Integration Tests**: Test form submission and data flow.
+- **Accessibility Tests**: Ensure form components meet accessibility standards.
+- **Visual Tests**: Use visual regression testing for form components.
+- **User Interaction Tests**: Test form interactions and user flows.
+
+### Form Component Documentation
+- **JSDoc Comments**: Add comprehensive JSDoc comments for all form components.
+- **Props Documentation**: Document all form props with types and descriptions.
+- **Usage Examples**: Include usage examples in form component documentation.
+- **Validation Rules**: Document validation rules and error messages.
+- **Accessibility Notes**: Document accessibility features and requirements.
+
+## CRITICAL RESPONSE RULES
+- **ALWAYS CHECK THIS FILE FIRST**: Before responding to any request, review this entire file
+- **Global Component Priority**: Always check for existing global components before creating new ones
+- **JavaScript Only**: Use JavaScript (.js/.jsx) NOT TypeScript for all code
+- **Shadcn UI**: Use Shadcn UI components for all UI elements
+- **Reusability First**: Prioritize reusable components over one-off solutions
+- **Consistency**: Follow all patterns and conventions defined in this file
+- **Documentation**: Add JSDoc comments to all functions and components
+- **Error Handling**: Implement proper error handling in all code
+- **Security**: Apply security best practices in all implementations
+- **Performance**: Consider performance implications in all solutions
+
+
+
+
+### File and Code Change Policy
+
+- **Manual File Creation and Editing**: All new files and code changes must be created and applied directly using the edit tool. Do not use terminal commands to create, move, or modify files unless explicitly instructed by the user.
+- **No Terminal Commands by Default**: Never run or suggest running terminal commands for file or code changes unless the user explicitly requests it.
+- **Direct Application**: All code changes, including new files, updates, and deletions, must be applied directly and automatically using the edit tool, not by manual copy-paste or terminal usage.
+- **Mandatory Compliance**: This policy is mandatory and overrides any other workflow unless the user provides explicit permission to use terminal commands.
+
+
+- You can @ files here
+- You can use markdown but dont have to

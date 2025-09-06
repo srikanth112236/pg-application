@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Expiry Fix Test</title>
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-button.danger {
+            background: #dc3545;
+        }
+        .test-button.danger:hover {
+            background: #c82333;
+        }
+        .test-button.success {
+            background: #28a745;
+        }
+        .test-button.success:hover {
+            background: #218838;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .token-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
+        .simulation-panel {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Token Expiry Fix Test</h1>
+        <p>This page tests the fixed token expiry functionality that handles expired tokens gracefully.</p>
+
+        <div class="simulation-panel">
+            <h3>🎯 Test Scenario</h3>
+            <p><strong>Problem:</strong> When token expires, logout API call fails with 401, causing errors</p>
+            <p><strong>Solution:</strong> Clear auth data immediately without API calls when token is expired</p>
+            <p><strong>Expected:</strong> Smooth redirect to appropriate login page based on user role</p>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 Current Token Status</h3>
+            <div id="tokenStatus" class="status info">
+                Checking token status...
+            </div>
+            <div id="tokenInfo" class="token-info" style="display: none;">
+                <strong>Token Details:</strong><br>
+                <div id="tokenDetails"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 Test Functions</h3>
+            <button class="test-button" onclick="checkTokenStatus()">
+                🔍 Check Token Status
+            </button>
+            <button class="test-button danger" onclick="simulateExpiredToken()">
+                ⏰ Simulate Expired Token
+            </button>
+            <button class="test-button success" onclick="testGracefulLogout()">
+                🚪 Test Graceful Logout
+            </button>
+            <button class="test-button" onclick="testRoleBasedRedirect()">
+                🎯 Test Role-Based Redirect
+            </button>
+            <button class="test-button danger" onclick="clearTokens()">
+                🗑️ Clear All Tokens
+            </button>
+        </div>
+
+        <div class="test-section">
+            <h3>🎭 Role Simulation</h3>
+            <button class="test-button" onclick="simulateSuperadmin()">
+                👑 Simulate Superadmin
+            </button>
+            <button class="test-button" onclick="simulateAdmin()">
+                🏢 Simulate Admin
+            </button>
+            <button class="test-button" onclick="simulateUser()">
+                👤 Simulate User
+            </button>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Test Results</h3>
+            <div id="testResults"></div>
+        </div>
+    </div>
+
+    <script>
+        // Token management functions
+        function getTokenFromStorage() {
+            return localStorage.getItem('accessToken');
+        }
+
+        function getRefreshTokenFromStorage() {
+            return localStorage.getItem('refreshToken');
+        }
+
+        function getUserFromStorage() {
+            const userStr = localStorage.getItem('user');
+            return userStr ? JSON.parse(userStr) : null;
+        }
+
+        function decodeJWT(token) {
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                return {
+                    exp: payload.exp,
+                    iat: payload.iat,
+                    userId: payload.userId,
+                    role: payload.role,
+                    expDate: new Date(payload.exp * 1000),
+                    iatDate: new Date(payload.iat * 1000),
+                    isExpired: payload.exp < (Date.now() / 1000)
+                };
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function checkTokenStatus() {
+            const token = getTokenFromStorage();
+            const refreshToken = getRefreshTokenFromStorage();
+            const user = getUserFromStorage();
+            
+            const statusDiv = document.getElementById('tokenStatus');
+            const tokenInfoDiv = document.getElementById('tokenInfo');
+            const tokenDetailsDiv = document.getElementById('tokenDetails');
+
+            if (!token) {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '❌ No access token found';
+                tokenInfoDiv.style.display = 'none';
+                return;
+            }
+
+            const decoded = decodeJWT(token);
+            if (!decoded) {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '❌ Invalid token format';
+                tokenInfoDiv.style.display = 'none';
+                return;
+            }
+
+            if (decoded.isExpired) {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '⏰ Token has expired';
+            } else {
+                statusDiv.className = 'status success';
+                statusDiv.innerHTML = '✅ Token is valid';
+            }
+
+            // Show token details
+            tokenInfoDiv.style.display = 'block';
+            tokenDetailsDiv.innerHTML = `
+                <strong>Access Token:</strong> ${token.substring(0, 50)}...<br>
+                <strong>Refresh Token:</strong> ${refreshToken ? refreshToken.substring(0, 50) + '...' : 'Not found'}<br>
+                <strong>User:</strong> ${user ? JSON.stringify(user, null, 2) : 'Not found'}<br>
+                <strong>Role:</strong> ${decoded.role || 'Unknown'}<br>
+                <strong>Issued At:</strong> ${decoded.iatDate.toLocaleString()}<br>
+                <strong>Expires At:</strong> ${decoded.expDate.toLocaleString()}<br>
+                <strong>Time Remaining:</strong> ${Math.max(0, Math.floor((decoded.exp * 1000 - Date.now()) / 1000))} seconds
+            `;
+        }
+
+        function simulateExpiredToken() {
+            const token = getTokenFromStorage();
+            if (!token) {
+                addTestResult('❌ No token to expire', 'error');
+                return;
+            }
+
+            const decoded = decodeJWT(token);
+            if (!decoded) {
+                addTestResult('❌ Invalid token format', 'error');
+                return;
+            }
+
+            // Create expired token by setting exp to past
+            const header = JSON.parse(atob(token.split('.')[0]));
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            payload.exp = Math.floor(Date.now() / 1000) - 3600; // 1 hour ago
+            
+            const newToken = btoa(JSON.stringify(header)) + '.' + 
+                           btoa(JSON.stringify(payload)) + '.' + 
+                           token.split('.')[2];
+            
+            localStorage.setItem('accessToken', newToken);
+            addTestResult('✅ Expired token simulated', 'success');
+            checkTokenStatus();
+        }
+
+        function testGracefulLogout() {
+            const user = getUserFromStorage();
+            const token = getTokenFromStorage();
+            
+            if (!token) {
+                addTestResult('❌ No token to test logout', 'error');
+                return;
+            }
+
+            // Simulate the graceful logout process
+            try {
+                // Clear auth data immediately (like the fix does)
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                localStorage.removeItem('user');
+                
+                const role = user?.role || 'unknown';
+                const redirectPath = role === 'superadmin' ? '/login' : '/admin/login';
+                
+                addTestResult(`✅ Graceful logout successful - would redirect to ${redirectPath}`, 'success');
+                addTestResult(`👤 User role: ${role}`, 'info');
+                addTestResult(`🎯 Redirect path: ${redirectPath}`, 'info');
+                
+            } catch (error) {
+                addTestResult('❌ Graceful logout failed: ' + error.message, 'error');
+            }
+        }
+
+        function testRoleBasedRedirect() {
+            const user = getUserFromStorage();
+            const role = user?.role || 'unknown';
+            
+            let expectedPath;
+            if (role === 'superadmin') {
+                expectedPath = '/login';
+            } else {
+                expectedPath = '/admin/login';
+            }
+            
+            addTestResult(`✅ Role-based redirect test passed`, 'success');
+            addTestResult(`👤 User role: ${role}`, 'info');
+            addTestResult(`🎯 Expected redirect: ${expectedPath}`, 'info');
+        }
+
+        function simulateSuperadmin() {
+            const user = {
+                _id: 'superadmin123',
+                firstName: 'Super',
+                lastName: 'Admin',
+                email: 'superadmin@example.com',
+                role: 'superadmin',
+                isEmailVerified: true,
+                isActive: true
+            };
+            
+            localStorage.setItem('user', JSON.stringify(user));
+            addTestResult('✅ Superadmin user simulated', 'success');
+            addTestResult('👑 Role: superadmin', 'info');
+            addTestResult('🎯 Would redirect to: /login', 'info');
+        }
+
+        function simulateAdmin() {
+            const user = {
+                _id: 'admin123',
+                firstName: 'PG',
+                lastName: 'Admin',
+                email: 'admin@example.com',
+                role: 'admin',
+                isEmailVerified: true,
+                isActive: true
+            };
+            
+            localStorage.setItem('user', JSON.stringify(user));
+            addTestResult('✅ Admin user simulated', 'success');
+            addTestResult('🏢 Role: admin', 'info');
+            addTestResult('🎯 Would redirect to: /admin/login', 'info');
+        }
+
+        function simulateUser() {
+            const user = {
+                _id: 'user123',
+                firstName: 'Regular',
+                lastName: 'User',
+                email: 'user@example.com',
+                role: 'user',
+                isEmailVerified: true,
+                isActive: true
+            };
+            
+            localStorage.setItem('user', JSON.stringify(user));
+            addTestResult('✅ Regular user simulated', 'success');
+            addTestResult('👤 Role: user', 'info');
+            addTestResult('🎯 Would redirect to: /admin/login', 'info');
+        }
+
+        function clearTokens() {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+            addTestResult('✅ All tokens cleared', 'success');
+            checkTokenStatus();
+        }
+
+        function addTestResult(message, type) {
+            const resultsDiv = document.getElementById('testResults');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `status ${type}`;
+            resultDiv.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            resultsDiv.appendChild(resultDiv);
+            
+            // Scroll to bottom
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkTokenStatus();
+            addTestResult('🚀 Token expiry fix test page loaded', 'info');
+            addTestResult('🔧 Testing graceful logout with expired tokens', 'info');
+        });
+    </script>
+</body>
+</html> 

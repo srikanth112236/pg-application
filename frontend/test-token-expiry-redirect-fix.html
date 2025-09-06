@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Expiry Redirect Fix Test</title>
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-button.danger {
+            background: #dc3545;
+        }
+        .test-button.danger:hover {
+            background: #c82333;
+        }
+        .test-button.success {
+            background: #28a745;
+        }
+        .test-button.success:hover {
+            background: #218838;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .simulation-panel {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .redirect-test {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Token Expiry Redirect Fix Test</h1>
+        <p>This page tests the fixed token expiry redirect functionality that prevents login loops.</p>
+
+        <div class="simulation-panel">
+            <h3>🎯 Problem Scenario</h3>
+            <p><strong>Issue:</strong> When token expires and user clicks "Log In Again", they get redirected to login page but immediately get redirected back to dashboard due to expired token still being in localStorage.</p>
+            <p><strong>Solution:</strong> Clear both localStorage and Redux state when token expires, and validate token before auto-authentication.</p>
+        </div>
+
+        <div class="redirect-test">
+            <h3>🔄 Redirect Flow Test</h3>
+            <p><strong>Expected Behavior:</strong></p>
+            <ul>
+                <li><strong>Superadmin:</strong> Token expires → Modal → Click "Log In Again" → Redirect to /login → Stay on login page</li>
+                <li><strong>Admin:</strong> Token expires → Modal → Click "Log In Again" → Redirect to /admin/login → Stay on login page</li>
+                <li><strong>No Auto-login:</strong> Should not automatically log back in with expired token</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 Test Functions</h3>
+            <button class="test-button" onclick="simulateSuperadminExpiry()">
+                👑 Test Superadmin Token Expiry
+            </button>
+            <button class="test-button" onclick="simulateAdminExpiry()">
+                🏢 Test Admin Token Expiry
+            </button>
+            <button class="test-button success" onclick="testRedirectFlow()">
+                🔄 Test Redirect Flow
+            </button>
+            <button class="test-button" onclick="testAutoLoginPrevention()">
+                🚫 Test Auto-Login Prevention
+            </button>
+            <button class="test-button danger" onclick="clearAllData()">
+                🗑️ Clear All Data
+            </button>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Current State</h3>
+            <div id="currentState" class="status info">
+                Checking current state...
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 Test Results</h3>
+            <div id="testResults"></div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate superadmin token expiry
+        function simulateSuperadminExpiry() {
+            // Create expired token for superadmin
+            const expiredToken = createExpiredToken('superadmin');
+            const user = {
+                _id: 'superadmin123',
+                firstName: 'Super',
+                lastName: 'Admin',
+                email: 'superadmin@example.com',
+                role: 'superadmin',
+                isEmailVerified: true,
+                isActive: true
+            };
+            
+            localStorage.setItem('accessToken', expiredToken);
+            localStorage.setItem('refreshToken', 'expired-refresh-token');
+            localStorage.setItem('user', JSON.stringify(user));
+            
+            addTestResult('✅ Superadmin expired token simulated', 'success');
+            addTestResult('👑 Role: superadmin', 'info');
+            addTestResult('⏰ Token: expired', 'info');
+            addTestResult('🎯 Expected redirect: /login', 'info');
+            
+            updateCurrentState();
+        }
+
+        // Simulate admin token expiry
+        function simulateAdminExpiry() {
+            // Create expired token for admin
+            const expiredToken = createExpiredToken('admin');
+            const user = {
+                _id: 'admin123',
+                firstName: 'PG',
+                lastName: 'Admin',
+                email: 'admin@example.com',
+                role: 'admin',
+                isEmailVerified: true,
+                isActive: true
+            };
+            
+            localStorage.setItem('accessToken', expiredToken);
+            localStorage.setItem('refreshToken', 'expired-refresh-token');
+            localStorage.setItem('user', JSON.stringify(user));
+            
+            addTestResult('✅ Admin expired token simulated', 'success');
+            addTestResult('🏢 Role: admin', 'info');
+            addTestResult('⏰ Token: expired', 'info');
+            addTestResult('🎯 Expected redirect: /admin/login', 'info');
+            
+            updateCurrentState();
+        }
+
+        // Test the redirect flow
+        function testRedirectFlow() {
+            const user = getUserFromStorage();
+            const token = getTokenFromStorage();
+            
+            if (!user || !token) {
+                addTestResult('❌ No user or token found for testing', 'error');
+                return;
+            }
+            
+            // Simulate the logout process
+            try {
+                // Clear auth data (like the fix does)
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                localStorage.removeItem('user');
+                
+                const role = user.role;
+                const redirectPath = role === 'superadmin' ? '/login' : '/admin/login';
+                
+                addTestResult(`✅ Redirect flow test passed`, 'success');
+                addTestResult(`👤 User role: ${role}`, 'info');
+                addTestResult(`🎯 Redirect path: ${redirectPath}`, 'info');
+                addTestResult(`🚫 Auth data cleared`, 'info');
+                addTestResult(`✅ No auto-login should occur`, 'success');
+                
+            } catch (error) {
+                addTestResult('❌ Redirect flow test failed: ' + error.message, 'error');
+            }
+        }
+
+        // Test auto-login prevention
+        function testAutoLoginPrevention() {
+            const user = getUserFromStorage();
+            const token = getTokenFromStorage();
+            
+            if (!user || !token) {
+                addTestResult('❌ No user or token found for testing', 'error');
+                return;
+            }
+            
+            // Check if token is expired
+            const isExpired = checkTokenExpiry(token);
+            
+            if (isExpired) {
+                addTestResult('✅ Auto-login prevention test passed', 'success');
+                addTestResult('⏰ Token is expired', 'info');
+                addTestResult('🚫 Should not auto-login with expired token', 'info');
+                addTestResult('✅ User should stay on login page', 'success');
+            } else {
+                addTestResult('⚠️ Token is not expired', 'info');
+                addTestResult('ℹ️ Auto-login prevention only applies to expired tokens', 'info');
+            }
+        }
+
+        // Clear all data
+        function clearAllData() {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+            
+            addTestResult('✅ All auth data cleared', 'success');
+            updateCurrentState();
+        }
+
+        // Helper functions
+        function getTokenFromStorage() {
+            return localStorage.getItem('accessToken');
+        }
+
+        function getUserFromStorage() {
+            const userStr = localStorage.getItem('user');
+            return userStr ? JSON.parse(userStr) : null;
+        }
+
+        function createExpiredToken(role) {
+            // Create a simple expired JWT token
+            const header = { alg: 'HS256', typ: 'JWT' };
+            const payload = {
+                userId: role === 'superadmin' ? 'superadmin123' : 'admin123',
+                role: role,
+                exp: Math.floor(Date.now() / 1000) - 3600, // 1 hour ago
+                iat: Math.floor(Date.now() / 1000) - 7200  // 2 hours ago
+            };
+            
+            const headerB64 = btoa(JSON.stringify(header));
+            const payloadB64 = btoa(JSON.stringify(payload));
+            const signature = 'expired-signature';
+            
+            return `${headerB64}.${payloadB64}.${signature}`;
+        }
+
+        function checkTokenExpiry(token) {
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                const currentTime = Date.now() / 1000;
+                return payload.exp < currentTime;
+            } catch (error) {
+                return true; // If we can't decode, consider it expired
+            }
+        }
+
+        function updateCurrentState() {
+            const user = getUserFromStorage();
+            const token = getTokenFromStorage();
+            const isExpired = token ? checkTokenExpiry(token) : true;
+            
+            const stateDiv = document.getElementById('currentState');
+            
+            if (!user || !token) {
+                stateDiv.className = 'status error';
+                stateDiv.innerHTML = '❌ No user or token found';
+                return;
+            }
+            
+            if (isExpired) {
+                stateDiv.className = 'status error';
+                stateDiv.innerHTML = `⏰ Expired token for ${user.role} user`;
+            } else {
+                stateDiv.className = 'status success';
+                stateDiv.innerHTML = `✅ Valid token for ${user.role} user`;
+            }
+        }
+
+        function addTestResult(message, type) {
+            const resultsDiv = document.getElementById('testResults');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `status ${type}`;
+            resultDiv.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            resultsDiv.appendChild(resultDiv);
+            
+            // Scroll to bottom
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCurrentState();
+            addTestResult('🚀 Token expiry redirect fix test page loaded', 'info');
+            addTestResult('🔧 Testing redirect flow and auto-login prevention', 'info');
+        });
+    </script>
+</body>
+</html> 

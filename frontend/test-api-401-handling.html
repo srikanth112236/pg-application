@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API 401 Handling Test</title>
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-button.danger {
+            background: #dc3545;
+        }
+        .test-button.danger:hover {
+            background: #c82333;
+        }
+        .test-button.success {
+            background: #28a745;
+        }
+        .test-button.success:hover {
+            background: #218838;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .simulation-panel {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .api-test {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #dc3545;
+        }
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 API 401 Handling Test</h1>
+        <p>This page tests the API 401 "Invalid token" error handling and token expiry modal functionality.</p>
+
+        <div class="simulation-panel">
+            <h3>🎯 Test Scenario</h3>
+            <p><strong>Issue:</strong> When API returns 401 "Invalid token" error, the application should automatically show token expiry modal and logout user.</p>
+            <p><strong>Solution:</strong> API interceptor detects 401 "Invalid token" errors and triggers token expiry modal via custom event.</p>
+        </div>
+
+        <div class="api-test">
+            <h3>🔄 API 401 Handling Flow</h3>
+            <p><strong>Expected Behavior:</strong></p>
+            <ul>
+                <li><strong>API Call:</strong> Make API call with invalid/expired token</li>
+                <li><strong>401 Response:</strong> API returns 401 "Invalid token" error</li>
+                <li><strong>Interceptor:</strong> API interceptor detects the error</li>
+                <li><strong>Event Dispatch:</strong> Custom 'tokenExpired' event is dispatched</li>
+                <li><strong>Modal Display:</strong> Token expiry modal appears</li>
+                <li><strong>Auto Logout:</strong> User is automatically logged out</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 Test Functions</h3>
+            <button class="test-button" onclick="simulateValidToken()">
+                ✅ Simulate Valid Token
+            </button>
+            <button class="test-button danger" onclick="simulateInvalidToken()">
+                ❌ Simulate Invalid Token
+            </button>
+            <button class="test-button" onclick="simulate401Error()">
+                🔒 Simulate 401 Error
+            </button>
+            <button class="test-button success" onclick="testEventDispatch()">
+                📡 Test Event Dispatch
+            </button>
+            <button class="test-button" onclick="testModalDisplay()">
+                🪟 Test Modal Display
+            </button>
+            <button class="test-button danger" onclick="clearAllData()">
+                🗑️ Clear All Data
+            </button>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Current State</h3>
+            <div id="currentState" class="status info">
+                Checking current state...
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 Test Results</h3>
+            <div id="testResults"></div>
+        </div>
+    </div>
+
+    <!-- Token Expiry Modal -->
+    <div id="tokenExpiryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">🚫 Session Expired</div>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="modalMessage">
+                Your authentication session has expired. For security reasons, you need to log in again.
+            </div>
+            <div style="margin-top: 20px;">
+                <button class="test-button" onclick="handleLogout()">Log In Again</button>
+                <button class="test-button" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate valid token
+        function simulateValidToken() {
+            const validToken = createValidToken();
+            localStorage.setItem('accessToken', validToken);
+            localStorage.setItem('user', JSON.stringify({
+                _id: 'user123',
+                firstName: 'Test',
+                lastName: 'User',
+                email: 'test@example.com',
+                role: 'admin'
+            }));
+            
+            addTestResult('✅ Valid token simulated', 'success');
+            updateCurrentState();
+        }
+
+        // Simulate invalid token
+        function simulateInvalidToken() {
+            const invalidToken = 'invalid.token.here';
+            localStorage.setItem('accessToken', invalidToken);
+            localStorage.setItem('user', JSON.stringify({
+                _id: 'user123',
+                firstName: 'Test',
+                lastName: 'User',
+                email: 'test@example.com',
+                role: 'admin'
+            }));
+            
+            addTestResult('❌ Invalid token simulated', 'error');
+            updateCurrentState();
+        }
+
+        // Simulate 401 error response
+        function simulate401Error() {
+            addTestResult('🔒 Simulating 401 "Invalid token" error...', 'info');
+            
+            // Simulate the API interceptor behavior
+            setTimeout(() => {
+                const errorResponse = {
+                    status: 401,
+                    data: {
+                        success: false,
+                        message: 'Invalid token.'
+                    }
+                };
+                
+                // Simulate the interceptor logic
+                if (errorResponse.status === 401) {
+                    const isInvalidToken = errorResponse.data.message === 'Invalid token.' || 
+                                         errorResponse.data.message === 'Invalid token' ||
+                                         errorResponse.data.message.includes('Invalid token');
+                    
+                    if (isInvalidToken) {
+                        addTestResult('🚫 Invalid token detected, triggering token expiry modal', 'error');
+                        
+                        // Dispatch custom event (like the real interceptor does)
+                        const tokenExpiryEvent = new CustomEvent('tokenExpired', {
+                            detail: {
+                                message: 'Your session has expired. Please log in again.',
+                                error: errorResponse.data
+                            }
+                        });
+                        window.dispatchEvent(tokenExpiryEvent);
+                        
+                        addTestResult('📡 Custom event dispatched', 'success');
+                        addTestResult('🪟 Modal should appear', 'info');
+                        
+                        // Show modal
+                        showModal('Your session has expired. Please log in again.');
+                    }
+                }
+            }, 1000);
+        }
+
+        // Test event dispatch
+        function testEventDispatch() {
+            addTestResult('📡 Testing custom event dispatch...', 'info');
+            
+            const testEvent = new CustomEvent('tokenExpired', {
+                detail: {
+                    message: 'Test: Your session has expired.',
+                    error: { success: false, message: 'Invalid token.' }
+                }
+            });
+            
+            window.dispatchEvent(testEvent);
+            addTestResult('✅ Custom event dispatched successfully', 'success');
+        }
+
+        // Test modal display
+        function testModalDisplay() {
+            addTestResult('🪟 Testing modal display...', 'info');
+            showModal('Test: Your session has expired. Please log in again.');
+            addTestResult('✅ Modal displayed successfully', 'success');
+        }
+
+        // Show modal
+        function showModal(message) {
+            const modal = document.getElementById('tokenExpiryModal');
+            const modalMessage = document.getElementById('modalMessage');
+            
+            modalMessage.textContent = message;
+            modal.style.display = 'block';
+            
+            addTestResult('🪟 Modal displayed with message: ' + message, 'info');
+        }
+
+        // Close modal
+        function closeModal() {
+            const modal = document.getElementById('tokenExpiryModal');
+            modal.style.display = 'none';
+            addTestResult('❌ Modal closed', 'info');
+        }
+
+        // Handle logout
+        function handleLogout() {
+            addTestResult('🚪 Logout initiated...', 'info');
+            
+            // Clear auth data
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+            
+            addTestResult('✅ Auth data cleared', 'success');
+            addTestResult('🎯 Would redirect to /admin/login', 'info');
+            
+            closeModal();
+            updateCurrentState();
+        }
+
+        // Clear all data
+        function clearAllData() {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+            
+            addTestResult('✅ All auth data cleared', 'success');
+            updateCurrentState();
+        }
+
+        // Helper functions
+        function createValidToken() {
+            const header = { alg: 'HS256', typ: 'JWT' };
+            const payload = {
+                userId: 'user123',
+                role: 'admin',
+                exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
+                iat: Math.floor(Date.now() / 1000)
+            };
+            
+            const headerB64 = btoa(JSON.stringify(header));
+            const payloadB64 = btoa(JSON.stringify(payload));
+            const signature = 'valid-signature';
+            
+            return `${headerB64}.${payloadB64}.${signature}`;
+        }
+
+        function updateCurrentState() {
+            const token = localStorage.getItem('accessToken');
+            const user = localStorage.getItem('user');
+            
+            const stateDiv = document.getElementById('currentState');
+            
+            if (!token || !user) {
+                stateDiv.className = 'status error';
+                stateDiv.innerHTML = '❌ No token or user found';
+                return;
+            }
+            
+            // Check if token is valid
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                const currentTime = Date.now() / 1000;
+                const isValid = payload.exp > currentTime;
+                
+                if (isValid) {
+                    stateDiv.className = 'status success';
+                    stateDiv.innerHTML = '✅ Valid token found';
+                } else {
+                    stateDiv.className = 'status error';
+                    stateDiv.innerHTML = '⏰ Expired token found';
+                }
+            } catch (error) {
+                stateDiv.className = 'status error';
+                stateDiv.innerHTML = '❌ Invalid token format';
+            }
+        }
+
+        function addTestResult(message, type) {
+            const resultsDiv = document.getElementById('testResults');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `status ${type}`;
+            resultDiv.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            resultsDiv.appendChild(resultDiv);
+            
+            // Scroll to bottom
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+
+        // Listen for token expiry events
+        window.addEventListener('tokenExpired', function(event) {
+            addTestResult('🚫 Token expiry event received: ' + JSON.stringify(event.detail), 'error');
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCurrentState();
+            addTestResult('🚀 API 401 handling test page loaded', 'info');
+            addTestResult('🔧 Testing 401 error handling and token expiry modal', 'info');
+        });
+    </script>
+</body>
+</html> 
