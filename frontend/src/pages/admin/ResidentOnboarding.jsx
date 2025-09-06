@@ -65,6 +65,12 @@ const ResidentOnboarding = () => {
     receiptNumber: ''
   });
   
+  // Payment status tracking
+  const [paymentStatus, setPaymentStatus] = useState({
+    advance: 'pending', // 'paid', 'pending', 'not_required'
+    rent: 'pending'     // 'paid', 'pending', 'not_required'
+  });
+  
   // Custom rent calculation modal
   const [showRentCalculationModal, setShowRentCalculationModal] = useState(false);
   const [perDayCost, setPerDayCost] = useState(0);
@@ -172,6 +178,25 @@ const ResidentOnboarding = () => {
       loadPGConfiguration();
     }
   }, [currentStep]);
+
+  // Pre-fill rent amount when sharing type is selected
+  useEffect(() => {
+    if (selectedSharingType && currentStep === 5) {
+      console.log('🔍 Sharing type selected, pre-filling rent amount:', selectedSharingType.cost);
+      setRentPayment(prev => ({
+        ...prev,
+        amount: selectedSharingType.cost.toString()
+      }));
+      
+      // Set payment status based on whether amount is provided
+      if (selectedSharingType.cost > 0) {
+        setPaymentStatus(prev => ({
+          ...prev,
+          rent: 'pending' // Will be updated to 'paid' when user enters payment details
+        }));
+      }
+    }
+  }, [selectedSharingType, currentStep]);
 
   useEffect(() => {
     console.log('🔄 Current step changed to:', currentStep);
@@ -446,6 +471,93 @@ const ResidentOnboarding = () => {
     setCurrentStep(6);
   };
 
+  // Handle payment status changes
+  const handlePaymentStatusChange = (paymentType, status) => {
+    console.log(`🔄 Payment status changed: ${paymentType} -> ${status}`);
+    setPaymentStatus(prev => ({
+      ...prev,
+      [paymentType]: status
+    }));
+
+    // If status is 'paid', ensure payment details are filled
+    if (status === 'paid') {
+      if (paymentType === 'advance' && !advancePayment.amount) {
+        setAdvancePayment(prev => ({
+          ...prev,
+          amount: advanceAmount.toString(),
+          date: new Date().toISOString().split('T')[0],
+          receiptNumber: `ADV-${Date.now()}`
+        }));
+      } else if (paymentType === 'rent' && !rentPayment.amount) {
+        setRentPayment(prev => ({
+          ...prev,
+          amount: selectedSharingType?.cost?.toString() || '0',
+          date: new Date().toISOString().split('T')[0],
+          receiptNumber: `RENT-${Date.now()}`
+        }));
+      }
+    } else if (status === 'not_required') {
+      // Clear payment details if not required
+      if (paymentType === 'advance') {
+        setAdvancePayment(prev => ({
+          ...prev,
+          amount: '',
+          date: '',
+          receiptNumber: ''
+        }));
+      } else if (paymentType === 'rent') {
+        setRentPayment(prev => ({
+          ...prev,
+          amount: '',
+          date: '',
+          receiptNumber: ''
+        }));
+      }
+    }
+  };
+
+  // Handle rent amount changes
+  const handleRentAmountChange = (amount) => {
+    setRentPayment(prev => ({
+      ...prev,
+      amount: amount
+    }));
+
+    // Update payment status based on amount
+    if (amount && parseFloat(amount) > 0) {
+      setPaymentStatus(prev => ({
+        ...prev,
+        rent: 'paid'
+      }));
+    } else {
+      setPaymentStatus(prev => ({
+        ...prev,
+        rent: 'pending'
+      }));
+    }
+  };
+
+  // Handle advance amount changes
+  const handleAdvanceAmountChange = (amount) => {
+    setAdvancePayment(prev => ({
+      ...prev,
+      amount: amount
+    }));
+
+    // Update payment status based on amount
+    if (amount && parseFloat(amount) > 0) {
+      setPaymentStatus(prev => ({
+        ...prev,
+        advance: 'paid'
+      }));
+    } else {
+      setPaymentStatus(prev => ({
+        ...prev,
+        advance: 'pending'
+      }));
+    }
+  };
+
   const handleOnboardingSubmit = async () => {
     if (!selectedResident || !selectedSharingType || !selectedRoom || !selectedBed) {
       toast.error('Please complete all required fields');
@@ -476,13 +588,16 @@ const ResidentOnboarding = () => {
         advancePayment: advancePayment.amount ? {
           amount: parseFloat(advancePayment.amount),
           date: advancePayment.date,
-          receiptNumber: advancePayment.receiptNumber
+          receiptNumber: advancePayment.receiptNumber,
+          status: paymentStatus.advance
         } : null,
         rentPayment: rentPayment.amount ? {
           amount: parseFloat(rentPayment.amount),
           date: rentPayment.date,
-          receiptNumber: rentPayment.receiptNumber
-        } : null
+          receiptNumber: rentPayment.receiptNumber,
+          status: paymentStatus.rent
+        } : null,
+        paymentStatus: paymentStatus
       };
 
       // Only include onboardingDate if it's different from the resident's existing check-in date
@@ -1945,11 +2060,50 @@ const ResidentOnboarding = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Advance Payment */}
         <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border border-green-200">
-          <div className="flex items-center space-x-2 mb-4">
-            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-              <CreditCard className="h-4 w-4 text-green-600" />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                <CreditCard className="h-4 w-4 text-green-600" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">Advance Payment</h3>
             </div>
-            <h3 className="text-lg font-bold text-gray-900">Advance Payment</h3>
+            
+            {/* Payment Status Selector */}
+            <div className="flex space-x-2">
+              <button
+                type="button"
+                onClick={() => handlePaymentStatusChange('advance', 'paid')}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  paymentStatus.advance === 'paid' 
+                    ? 'bg-green-100 text-green-700 border border-green-300' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-green-50'
+                }`}
+              >
+                Paid
+              </button>
+              <button
+                type="button"
+                onClick={() => handlePaymentStatusChange('advance', 'pending')}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  paymentStatus.advance === 'pending' 
+                    ? 'bg-yellow-100 text-yellow-700 border border-yellow-300' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-yellow-50'
+                }`}
+              >
+                Pending
+              </button>
+              <button
+                type="button"
+                onClick={() => handlePaymentStatusChange('advance', 'not_required')}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  paymentStatus.advance === 'not_required' 
+                    ? 'bg-gray-100 text-gray-700 border border-gray-300' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                Not Required
+              </button>
+            </div>
           </div>
           
           <div className="space-y-4">
@@ -1961,10 +2115,11 @@ const ResidentOnboarding = () => {
                 type="number"
                 placeholder="0.00"
                 value={advancePayment.amount}
-                onChange={(e) => setAdvancePayment(prev => ({ ...prev, amount: e.target.value }))}
+                onChange={(e) => handleAdvanceAmountChange(e.target.value)}
                 className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-100 focus:border-green-500 transition-all"
                 min="0"
                 step="0.01"
+                disabled={paymentStatus.advance === 'not_required'}
               />
             </div>
             
@@ -1998,11 +2153,50 @@ const ResidentOnboarding = () => {
 
         {/* Rent Payment */}
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-200">
-          <div className="flex items-center space-x-2 mb-4">
-            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-              <Home className="h-4 w-4 text-blue-600" />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                <Home className="h-4 w-4 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">Rent Payment</h3>
             </div>
-            <h3 className="text-lg font-bold text-gray-900">Rent Payment</h3>
+            
+            {/* Payment Status Selector */}
+            <div className="flex space-x-2">
+              <button
+                type="button"
+                onClick={() => handlePaymentStatusChange('rent', 'paid')}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  paymentStatus.rent === 'paid' 
+                    ? 'bg-green-100 text-green-700 border border-green-300' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-green-50'
+                }`}
+              >
+                Paid
+              </button>
+              <button
+                type="button"
+                onClick={() => handlePaymentStatusChange('rent', 'pending')}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  paymentStatus.rent === 'pending' 
+                    ? 'bg-yellow-100 text-yellow-700 border border-yellow-300' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-yellow-50'
+                }`}
+              >
+                Pending
+              </button>
+              <button
+                type="button"
+                onClick={() => handlePaymentStatusChange('rent', 'not_required')}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  paymentStatus.rent === 'not_required' 
+                    ? 'bg-gray-100 text-gray-700 border border-gray-300' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                Not Required
+              </button>
+            </div>
           </div>
           
           <div className="space-y-4">
@@ -2015,15 +2209,17 @@ const ResidentOnboarding = () => {
                   type="number"
                   placeholder="0.00"
                   value={rentPayment.amount}
-                  onChange={(e) => setRentPayment(prev => ({ ...prev, amount: e.target.value }))}
+                  onChange={(e) => handleRentAmountChange(e.target.value)}
                   className="flex-1 px-3 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all"
                   min="0"
                   step="0.01"
+                  disabled={paymentStatus.rent === 'not_required'}
                 />
                 <button
                   type="button"
                   onClick={handleOpenRentCalculation}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                  disabled={paymentStatus.rent === 'not_required'}
                 >
                   <DollarSign className="h-4 w-4" />
                   Custom
@@ -2071,14 +2267,34 @@ const ResidentOnboarding = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="text-center p-4 bg-white rounded-lg border border-purple-200">
-            <p className="text-sm text-gray-600 font-medium">Advance Payment</p>
+            <div className="flex items-center justify-center space-x-2 mb-2">
+              <p className="text-sm text-gray-600 font-medium">Advance Payment</p>
+              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                paymentStatus.advance === 'paid' ? 'bg-green-100 text-green-700' :
+                paymentStatus.advance === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                'bg-gray-100 text-gray-700'
+              }`}>
+                {paymentStatus.advance === 'paid' ? 'Paid' :
+                 paymentStatus.advance === 'pending' ? 'Pending' : 'Not Required'}
+              </span>
+            </div>
             <p className="text-2xl font-bold text-green-600">
               ₹{advancePayment.amount ? parseFloat(advancePayment.amount).toLocaleString() : '0.00'}
             </p>
           </div>
           
           <div className="text-center p-4 bg-white rounded-lg border border-purple-200">
-            <p className="text-sm text-gray-600 font-medium">Rent Payment</p>
+            <div className="flex items-center justify-center space-x-2 mb-2">
+              <p className="text-sm text-gray-600 font-medium">Rent Payment</p>
+              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                paymentStatus.rent === 'paid' ? 'bg-green-100 text-green-700' :
+                paymentStatus.rent === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                'bg-gray-100 text-gray-700'
+              }`}>
+                {paymentStatus.rent === 'paid' ? 'Paid' :
+                 paymentStatus.rent === 'pending' ? 'Pending' : 'Not Required'}
+              </span>
+            </div>
             <p className="text-2xl font-bold text-blue-600">
               ₹{rentPayment.amount ? parseFloat(rentPayment.amount).toLocaleString() : '0.00'}
             </p>
@@ -2088,6 +2304,11 @@ const ResidentOnboarding = () => {
             <p className="text-sm text-gray-600 font-medium">Total Amount</p>
             <p className="text-2xl font-bold text-purple-600">
               ₹{((advancePayment.amount ? parseFloat(advancePayment.amount) : 0) + (rentPayment.amount ? parseFloat(rentPayment.amount) : 0)).toLocaleString()}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              {paymentStatus.advance === 'paid' && paymentStatus.rent === 'paid' ? 'All Payments Complete' :
+               paymentStatus.advance === 'pending' || paymentStatus.rent === 'pending' ? 'Some Payments Pending' :
+               'No Payments Required'}
             </p>
           </div>
         </div>

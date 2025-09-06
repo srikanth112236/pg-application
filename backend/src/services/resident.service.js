@@ -763,7 +763,8 @@ class ResidentService {
         updateData.advancePayment = {
           amount: onboardingData.advancePayment.amount || 0,
           date: onboardingData.advancePayment.date ? new Date(onboardingData.advancePayment.date) : new Date(),
-          receiptNumber: onboardingData.advancePayment.receiptNumber || `ADV-${Date.now()}`
+          receiptNumber: onboardingData.advancePayment.receiptNumber || `ADV-${Date.now()}`,
+          status: onboardingData.advancePayment.status || 'pending'
         };
       }
 
@@ -771,7 +772,8 @@ class ResidentService {
         updateData.rentPayment = {
           amount: onboardingData.rentPayment.amount || 0,
           date: onboardingData.rentPayment.date ? new Date(onboardingData.rentPayment.date) : new Date(),
-          receiptNumber: onboardingData.rentPayment.receiptNumber || `RENT-${Date.now()}`
+          receiptNumber: onboardingData.rentPayment.receiptNumber || `RENT-${Date.now()}`,
+          status: onboardingData.rentPayment.status || 'pending'
         };
       }
 
@@ -780,10 +782,30 @@ class ResidentService {
       const rentAmount = (onboardingData.rentPayment?.amount || 0);
       updateData.totalAmountPaid = advanceAmount + rentAmount;
 
-      // Update payment status
-      if (updateData.totalAmountPaid > 0) {
-        updateData.paymentStatus = 'paid';
-        updateData.lastPaymentDate = new Date();
+      // Update payment status based on payment status from frontend
+      if (onboardingData.paymentStatus) {
+        const { advance, rent } = onboardingData.paymentStatus;
+        
+        // Determine overall payment status
+        if (advance === 'paid' && rent === 'paid') {
+          updateData.paymentStatus = 'paid';
+          updateData.lastPaymentDate = new Date();
+        } else if (advance === 'paid' || rent === 'paid') {
+          updateData.paymentStatus = 'partial';
+          updateData.lastPaymentDate = new Date();
+        } else if (advance === 'pending' || rent === 'pending') {
+          updateData.paymentStatus = 'pending';
+        } else {
+          updateData.paymentStatus = 'not_required';
+        }
+      } else {
+        // Fallback to old logic
+        if (updateData.totalAmountPaid > 0) {
+          updateData.paymentStatus = 'paid';
+          updateData.lastPaymentDate = new Date();
+        } else {
+          updateData.paymentStatus = 'pending';
+        }
       }
 
       const result = await Resident.findByIdAndUpdate(residentId, updateData, { new: true });
